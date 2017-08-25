@@ -1,6 +1,9 @@
 module Main exposing (main)
 
-import Html
+import Html exposing (Html, button, div, h1, header, input, text)
+import Html.Attributes as Attr
+import Html.Events as Events
+import Random
 
 
 main : Program Never Model Msg
@@ -13,17 +16,36 @@ main =
         }
 
 
+(=>) : a -> b -> ( a, b )
+(=>) =
+    (,)
+infixr 9 =>
+
+
 
 -- MODEL
 
 
 type alias Model =
-    {}
+    { items : List Item
+    , generatorCount : Maybe Int
+    }
 
 
 init : ( Model, Cmd Msg )
 init =
-    Model ! []
+    Model [] Nothing => (Random.list 12 itemGenerator |> Random.generate SetItems)
+
+
+type alias Item =
+    { dimensions : Dimensions
+    }
+
+
+type alias Dimensions =
+    { height : Float
+    , width : Float
+    }
 
 
 
@@ -32,13 +54,53 @@ init =
 
 type Msg
     = NoOp
+    | UpdateGeneratorCount String
+    | GenerateRandomItem
+    | SetItems (List Item)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         NoOp ->
-            model ! []
+            model => Cmd.none
+
+        UpdateGeneratorCount intString ->
+            case String.toInt intString of
+                Ok count ->
+                    { model | generatorCount = Just count } => Cmd.none
+
+                Err _ ->
+                    if intString == "" then
+                        { model | generatorCount = Nothing } => Cmd.none
+                    else
+                        model => Cmd.none
+
+        GenerateRandomItem ->
+            case model.generatorCount of
+                Just generatorCount ->
+                    { model | generatorCount = Just generatorCount }
+                        => (Random.list generatorCount itemGenerator |> Random.generate SetItems)
+
+                Nothing ->
+                    { model | generatorCount = Nothing }
+                        => Cmd.none
+
+        SetItems items ->
+            { model | items = items, generatorCount = Nothing } => Cmd.none
+
+
+tupleToDimensions : ( Float, Float ) -> Dimensions
+tupleToDimensions ( height, width ) =
+    Dimensions height width
+
+
+itemGenerator : Random.Generator Item
+itemGenerator =
+    Random.pair
+        (Random.float 50 500)
+        (Random.float 240 240)
+        |> Random.map (tupleToDimensions >> Item)
 
 
 
@@ -54,6 +116,50 @@ subscriptions model =
 -- VIEW
 
 
-view : Model -> Html.Html Msg
+view : Model -> Html Msg
 view model =
-    Html.div [] [ Html.text "Hello World" ]
+    div
+        []
+        [ header []
+            [ h1 [] [ text "Elm Dynamic List" ]
+            ]
+        , div []
+            [ input
+                [ model.generatorCount
+                    |> displayGeneratorCount
+                    |> Attr.value
+                , Events.onInput UpdateGeneratorCount
+                ]
+                []
+            , button
+                [ Events.onClick GenerateRandomItem ]
+                [ text "Generate Items" ]
+            ]
+        , div [] (List.map itemView model.items)
+        , div [] [ text <| toString model ]
+        ]
+
+
+itemView : Item -> Html Msg
+itemView { dimensions } =
+    div
+        [ ( "border", "1px solid black" )
+            :: ( "display", "inline-block" )
+            :: dimensionsStyle dimensions
+            |> Attr.style
+        ]
+        []
+
+
+dimensionsStyle : Dimensions -> List ( String, String )
+dimensionsStyle { height, width } =
+    [ ( "height", toString height ++ "px" )
+    , ( "width", toString width ++ "px" )
+    ]
+
+
+displayGeneratorCount : Maybe Int -> String
+displayGeneratorCount generatorCount =
+    generatorCount
+        |> Maybe.map toString
+        |> Maybe.withDefault ""
