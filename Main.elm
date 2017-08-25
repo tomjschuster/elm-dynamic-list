@@ -28,13 +28,27 @@ infixr 9 =>
 
 type alias Model =
     { generatorCount : Maybe Int
+    , layout : Layout
     , items : List Item
     }
 
 
 init : ( Model, Cmd Msg )
 init =
-    Model Nothing [] => (Random.list 12 itemGenerator |> Random.generate SetItems)
+    Model Nothing defaultLayout []
+        => (Random.list 12 itemGenerator |> Random.generate SetItems)
+
+
+type alias Layout =
+    { columnWidth : Float
+    , xMargin : Float
+    , yMargin : Float
+    }
+
+
+defaultLayout : Layout
+defaultLayout =
+    Layout 240 12 12
 
 
 type alias Item =
@@ -55,9 +69,16 @@ type alias Dimensions =
 type Msg
     = NoOp
     | UpdateGeneratorCount String
+    | UpdateLayout LayoutUpdate
     | GenerateRandomItem
     | SetItems (List Item)
     | ClearItems
+
+
+type LayoutUpdate
+    = UpdateColumnWidth Float
+    | UpdateXMargin Float
+    | UpdateYMargin Float
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -76,6 +97,24 @@ update msg model =
                         { model | generatorCount = Nothing } => Cmd.none
                     else
                         model => Cmd.none
+
+        UpdateLayout layoutUpdate ->
+            let
+                { layout } =
+                    model
+
+                updatedLayout =
+                    case layoutUpdate of
+                        UpdateColumnWidth columnWidth ->
+                            { layout | columnWidth = columnWidth }
+
+                        UpdateXMargin xMargin ->
+                            { layout | xMargin = xMargin }
+
+                        UpdateYMargin yMargin ->
+                            { layout | yMargin = yMargin }
+            in
+            { model | layout = updatedLayout } => Cmd.none
 
         GenerateRandomItem ->
             case model.generatorCount of

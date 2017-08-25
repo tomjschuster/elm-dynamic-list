@@ -9111,10 +9111,15 @@ _tomjschuster$elm_dynamic_list$Main_ops['=>'] = F2(
 	function (v0, v1) {
 		return {ctor: '_Tuple2', _0: v0, _1: v1};
 	});
-var _tomjschuster$elm_dynamic_list$Main$Model = F2(
-	function (a, b) {
-		return {generatorCount: a, items: b};
+var _tomjschuster$elm_dynamic_list$Main$Model = F3(
+	function (a, b, c) {
+		return {generatorCount: a, layout: b, items: c};
 	});
+var _tomjschuster$elm_dynamic_list$Main$Layout = F3(
+	function (a, b, c) {
+		return {columnWidth: a, xMargin: b, yMargin: c};
+	});
+var _tomjschuster$elm_dynamic_list$Main$defaultLayout = A3(_tomjschuster$elm_dynamic_list$Main$Layout, 240, 12, 12);
 var _tomjschuster$elm_dynamic_list$Main$Item = function (a) {
 	return {dimensions: a};
 };
@@ -9142,9 +9147,10 @@ var _tomjschuster$elm_dynamic_list$Main$SetItems = function (a) {
 };
 var _tomjschuster$elm_dynamic_list$Main$init = A2(
 	_tomjschuster$elm_dynamic_list$Main_ops['=>'],
-	A2(
+	A3(
 		_tomjschuster$elm_dynamic_list$Main$Model,
 		_elm_lang$core$Maybe$Nothing,
+		_tomjschuster$elm_dynamic_list$Main$defaultLayout,
 		{ctor: '[]'}),
 	A2(
 		_elm_lang$core$Random$generate,
@@ -9176,21 +9182,47 @@ var _tomjschuster$elm_dynamic_list$Main$update = F2(
 							{generatorCount: _elm_lang$core$Maybe$Nothing}),
 						_elm_lang$core$Platform_Cmd$none) : A2(_tomjschuster$elm_dynamic_list$Main_ops['=>'], model, _elm_lang$core$Platform_Cmd$none);
 				}
+			case 'UpdateLayout':
+				var _p10 = model;
+				var layout = _p10.layout;
+				var updatedLayout = function () {
+					var _p11 = _p7._0;
+					switch (_p11.ctor) {
+						case 'UpdateColumnWidth':
+							return _elm_lang$core$Native_Utils.update(
+								layout,
+								{columnWidth: _p11._0});
+						case 'UpdateXMargin':
+							return _elm_lang$core$Native_Utils.update(
+								layout,
+								{xMargin: _p11._0});
+						default:
+							return _elm_lang$core$Native_Utils.update(
+								layout,
+								{yMargin: _p11._0});
+					}
+				}();
+				return A2(
+					_tomjschuster$elm_dynamic_list$Main_ops['=>'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{layout: updatedLayout}),
+					_elm_lang$core$Platform_Cmd$none);
 			case 'GenerateRandomItem':
-				var _p10 = model.generatorCount;
-				if (_p10.ctor === 'Just') {
-					var _p11 = _p10._0;
+				var _p12 = model.generatorCount;
+				if (_p12.ctor === 'Just') {
+					var _p13 = _p12._0;
 					return A2(
 						_tomjschuster$elm_dynamic_list$Main_ops['=>'],
 						_elm_lang$core$Native_Utils.update(
 							model,
 							{
-								generatorCount: _elm_lang$core$Maybe$Just(_p11)
+								generatorCount: _elm_lang$core$Maybe$Just(_p13)
 							}),
 						A2(
 							_elm_lang$core$Random$generate,
 							_tomjschuster$elm_dynamic_list$Main$SetItems,
-							A2(_elm_lang$core$Random$list, _p11, _tomjschuster$elm_dynamic_list$Main$itemGenerator)));
+							A2(_elm_lang$core$Random$list, _p13, _tomjschuster$elm_dynamic_list$Main$itemGenerator)));
 				} else {
 					return A2(
 						_tomjschuster$elm_dynamic_list$Main_ops['=>'],
@@ -9218,6 +9250,9 @@ var _tomjschuster$elm_dynamic_list$Main$update = F2(
 		}
 	});
 var _tomjschuster$elm_dynamic_list$Main$GenerateRandomItem = {ctor: 'GenerateRandomItem'};
+var _tomjschuster$elm_dynamic_list$Main$UpdateLayout = function (a) {
+	return {ctor: 'UpdateLayout', _0: a};
+};
 var _tomjschuster$elm_dynamic_list$Main$UpdateGeneratorCount = function (a) {
 	return {ctor: 'UpdateGeneratorCount', _0: a};
 };
@@ -9361,6 +9396,15 @@ var _tomjschuster$elm_dynamic_list$Main$view = function (model) {
 var _tomjschuster$elm_dynamic_list$Main$main = _elm_lang$html$Html$program(
 	{init: _tomjschuster$elm_dynamic_list$Main$init, update: _tomjschuster$elm_dynamic_list$Main$update, subscriptions: _tomjschuster$elm_dynamic_list$Main$subscriptions, view: _tomjschuster$elm_dynamic_list$Main$view})();
 var _tomjschuster$elm_dynamic_list$Main$NoOp = {ctor: 'NoOp'};
+var _tomjschuster$elm_dynamic_list$Main$UpdateYMargin = function (a) {
+	return {ctor: 'UpdateYMargin', _0: a};
+};
+var _tomjschuster$elm_dynamic_list$Main$UpdateXMargin = function (a) {
+	return {ctor: 'UpdateXMargin', _0: a};
+};
+var _tomjschuster$elm_dynamic_list$Main$UpdateColumnWidth = function (a) {
+	return {ctor: 'UpdateColumnWidth', _0: a};
+};
 
 var Elm = {};
 Elm['Main'] = Elm['Main'] || {};
