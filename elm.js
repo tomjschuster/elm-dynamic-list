@@ -9113,7 +9113,7 @@ _tomjschuster$elm_dynamic_list$Main_ops['=>'] = F2(
 	});
 var _tomjschuster$elm_dynamic_list$Main$Model = F2(
 	function (a, b) {
-		return {items: a, generatorCount: b};
+		return {generatorCount: a, items: b};
 	});
 var _tomjschuster$elm_dynamic_list$Main$Item = function (a) {
 	return {dimensions: a};
@@ -9136,6 +9136,7 @@ var _tomjschuster$elm_dynamic_list$Main$itemGenerator = A2(
 		_elm_lang$core$Random$pair,
 		A2(_elm_lang$core$Random$float, 50, 500),
 		A2(_elm_lang$core$Random$float, 240, 240)));
+var _tomjschuster$elm_dynamic_list$Main$ClearItems = {ctor: 'ClearItems'};
 var _tomjschuster$elm_dynamic_list$Main$SetItems = function (a) {
 	return {ctor: 'SetItems', _0: a};
 };
@@ -9143,8 +9144,8 @@ var _tomjschuster$elm_dynamic_list$Main$init = A2(
 	_tomjschuster$elm_dynamic_list$Main_ops['=>'],
 	A2(
 		_tomjschuster$elm_dynamic_list$Main$Model,
-		{ctor: '[]'},
-		_elm_lang$core$Maybe$Nothing),
+		_elm_lang$core$Maybe$Nothing,
+		{ctor: '[]'}),
 	A2(
 		_elm_lang$core$Random$generate,
 		_tomjschuster$elm_dynamic_list$Main$SetItems,
@@ -9198,12 +9199,21 @@ var _tomjschuster$elm_dynamic_list$Main$update = F2(
 							{generatorCount: _elm_lang$core$Maybe$Nothing}),
 						_elm_lang$core$Platform_Cmd$none);
 				}
-			default:
+			case 'SetItems':
 				return A2(
 					_tomjschuster$elm_dynamic_list$Main_ops['=>'],
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{items: _p7._0, generatorCount: _elm_lang$core$Maybe$Nothing}),
+					_elm_lang$core$Platform_Cmd$none);
+			default:
+				return A2(
+					_tomjschuster$elm_dynamic_list$Main_ops['=>'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{
+							items: {ctor: '[]'}
+						}),
 					_elm_lang$core$Platform_Cmd$none);
 		}
 	});
@@ -9235,59 +9245,115 @@ var _tomjschuster$elm_dynamic_list$Main$view = function (model) {
 			_1: {
 				ctor: '::',
 				_0: A2(
-					_elm_lang$html$Html$div,
+					_elm_lang$html$Html$main_,
 					{ctor: '[]'},
 					{
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$input,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$value(
-									_tomjschuster$elm_dynamic_list$Main$displayGeneratorCount(model.generatorCount)),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Events$onInput(_tomjschuster$elm_dynamic_list$Main$UpdateGeneratorCount),
-									_1: {ctor: '[]'}
-								}
-							},
-							{ctor: '[]'}),
-						_1: {
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$button,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Events$onClick(_tomjschuster$elm_dynamic_list$Main$GenerateRandomItem),
-									_1: {ctor: '[]'}
-								},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text('Generate Items'),
-									_1: {ctor: '[]'}
-								}),
-							_1: {ctor: '[]'}
-						}
-					}),
-				_1: {
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$div,
-						{ctor: '[]'},
-						A2(_elm_lang$core$List$map, _tomjschuster$elm_dynamic_list$Main$itemView, model.items)),
-					_1: {
 						ctor: '::',
 						_0: A2(
 							_elm_lang$html$Html$div,
 							{ctor: '[]'},
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html$text(
-									_elm_lang$core$Basics$toString(model)),
-								_1: {ctor: '[]'}
+								_0: A2(
+									_elm_lang$html$Html$input,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$value(
+											_tomjschuster$elm_dynamic_list$Main$displayGeneratorCount(model.generatorCount)),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Events$onInput(_tomjschuster$elm_dynamic_list$Main$UpdateGeneratorCount),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$type_('number'),
+												_1: {ctor: '[]'}
+											}
+										}
+									},
+									{ctor: '[]'}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$button,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Events$onClick(_tomjschuster$elm_dynamic_list$Main$GenerateRandomItem),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$disabled(
+													_elm_lang$core$Native_Utils.eq(model.generatorCount, _elm_lang$core$Maybe$Nothing)),
+												_1: {ctor: '[]'}
+											}
+										},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text('Generate Items'),
+											_1: {ctor: '[]'}
+										}),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$button,
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Events$onClick(_tomjschuster$elm_dynamic_list$Main$ClearItems),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$disabled(
+														_elm_lang$core$List$isEmpty(model.items)),
+													_1: {ctor: '[]'}
+												}
+											},
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text('Clear Items'),
+												_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
+									}
+								}
 							}),
-						_1: {ctor: '[]'}
-					}
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$div,
+								{ctor: '[]'},
+								A2(_elm_lang$core$List$map, _tomjschuster$elm_dynamic_list$Main$itemView, model.items)),
+							_1: {ctor: '[]'}
+						}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$footer,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$code,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$style(
+										{
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: 'width', _1: '500px'},
+											_1: {
+												ctor: '::',
+												_0: {ctor: '_Tuple2', _0: 'display', _1: 'block'},
+												_1: {ctor: '[]'}
+											}
+										}),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text(
+										_elm_lang$core$Basics$toString(model)),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
 				}
 			}
 		});

@@ -1,6 +1,6 @@
 module Main exposing (main)
 
-import Html exposing (Html, button, div, h1, header, input, text)
+import Html exposing (Html, button, code, div, footer, h1, header, input, main_, text)
 import Html.Attributes as Attr
 import Html.Events as Events
 import Random
@@ -27,14 +27,14 @@ infixr 9 =>
 
 
 type alias Model =
-    { items : List Item
-    , generatorCount : Maybe Int
+    { generatorCount : Maybe Int
+    , items : List Item
     }
 
 
 init : ( Model, Cmd Msg )
 init =
-    Model [] Nothing => (Random.list 12 itemGenerator |> Random.generate SetItems)
+    Model Nothing [] => (Random.list 12 itemGenerator |> Random.generate SetItems)
 
 
 type alias Item =
@@ -57,6 +57,7 @@ type Msg
     | UpdateGeneratorCount String
     | GenerateRandomItem
     | SetItems (List Item)
+    | ClearItems
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -89,6 +90,9 @@ update msg model =
         SetItems items ->
             { model | items = items, generatorCount = Nothing } => Cmd.none
 
+        ClearItems ->
+            { model | items = [] } => Cmd.none
+
 
 tupleToDimensions : ( Float, Float ) -> Dimensions
 tupleToDimensions ( height, width ) =
@@ -120,23 +124,41 @@ view : Model -> Html Msg
 view model =
     div
         []
-        [ header []
+        [ header
+            []
             [ h1 [] [ text "Elm Dynamic List" ]
             ]
-        , div []
-            [ input
-                [ model.generatorCount
-                    |> displayGeneratorCount
-                    |> Attr.value
-                , Events.onInput UpdateGeneratorCount
-                ]
+        , main_
+            []
+            [ div
                 []
-            , button
-                [ Events.onClick GenerateRandomItem ]
-                [ text "Generate Items" ]
+                [ input
+                    [ model.generatorCount
+                        |> displayGeneratorCount
+                        |> Attr.value
+                    , Events.onInput UpdateGeneratorCount
+                    , Attr.type_ "number"
+                    ]
+                    []
+                , button
+                    [ Events.onClick GenerateRandomItem
+                    , Attr.disabled (model.generatorCount == Nothing)
+                    ]
+                    [ text "Generate Items" ]
+                , button
+                    [ Events.onClick ClearItems
+                    , Attr.disabled (List.isEmpty model.items)
+                    ]
+                    [ text "Clear Items" ]
+                ]
+            , div [] (List.map itemView model.items)
             ]
-        , div [] (List.map itemView model.items)
-        , div [] [ text <| toString model ]
+        , footer
+            []
+            [ code
+                [ Attr.style [ ( "width", "500px" ), ( "display", "block" ) ] ]
+                [ text <| toString model ]
+            ]
         ]
 
 
