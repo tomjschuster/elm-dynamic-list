@@ -40,15 +40,15 @@ init =
 
 
 type alias Layout =
-    { columnWidth : Int
-    , xMargin : Int
-    , yMargin : Int
+    { columnWidth : Maybe Int
+    , xMargin : Maybe Int
+    , yMargin : Maybe Int
     }
 
 
 defaultLayout : Layout
 defaultLayout =
-    Layout 240 12 12
+    Layout (Just 240) (Just 12) (Just 12)
 
 
 type alias Item =
@@ -100,7 +100,10 @@ update msg model =
                     model
 
                 columnWidth =
-                    Result.withDefault 240 (String.toInt columnWidthStr)
+                    if columnWidthStr == "" then
+                        Nothing
+                    else
+                        Just (Result.withDefault 240 (String.toInt columnWidthStr))
 
                 updatedLayout =
                     { layout | columnWidth = columnWidth }
@@ -113,7 +116,11 @@ update msg model =
                     model
 
                 xMargin =
-                    Result.withDefault 0 (String.toInt xMarginStr)
+                    if xMarginStr == "" then
+                        Nothing
+                    else
+                        Just
+                            (Result.withDefault 0 (String.toInt xMarginStr))
 
                 updatedLayout =
                     { layout | xMargin = xMargin }
@@ -126,7 +133,11 @@ update msg model =
                     model
 
                 yMargin =
-                    Result.withDefault 0 (String.toInt yMarginStr)
+                    if yMarginStr == "" then
+                        Nothing
+                    else
+                        Just
+                            (Result.withDefault 0 (String.toInt yMarginStr))
 
                 updatedLayout =
                     { layout | yMargin = yMargin }
@@ -159,7 +170,7 @@ itemGenerator : Layout -> Random.Generator Item
 itemGenerator layout =
     Random.pair
         (Random.float 50 500)
-        (Random.float (toFloat layout.columnWidth) (toFloat layout.columnWidth))
+        (Random.float (toFloat (Maybe.withDefault 240 layout.columnWidth)) (toFloat (Maybe.withDefault 240 layout.columnWidth)))
         |> Random.map (tupleToDimensions >> Item)
 
 
@@ -202,7 +213,7 @@ controlPanel model =
                 [ label [ Attr.style [ ( "display", "block" ) ] ] [ text "Item Generator" ]
                 , input
                     [ model.generatorCount
-                        |> displayGeneratorCount
+                        |> viewMaybeInt
                         |> Attr.value
                     , Events.onInput UpdateGeneratorCount
                     , Attr.type_ "number"
@@ -228,7 +239,9 @@ controlPanel model =
                     [ Attr.style [ ( "width", "50px" ) ]
                     , Attr.type_ "number"
                     , Events.onInput UpdateColumnWidth
-                    , model.layout.columnWidth |> toString |> Attr.value
+                    , model.layout.columnWidth
+                        |> viewMaybeInt
+                        |> Attr.value
                     ]
                     []
                 ]
@@ -238,7 +251,9 @@ controlPanel model =
                     [ Attr.style [ ( "width", "50px" ) ]
                     , Attr.type_ "number"
                     , Events.onInput UpdateXMargin
-                    , model.layout.xMargin |> toString |> Attr.value
+                    , model.layout.xMargin
+                        |> viewMaybeInt
+                        |> Attr.value
                     ]
                     []
                 ]
@@ -248,7 +263,9 @@ controlPanel model =
                     [ Attr.style [ ( "width", "50px" ) ]
                     , Attr.type_ "number"
                     , Events.onInput UpdateYMargin
-                    , model.layout.yMargin |> toString |> Attr.value
+                    , model.layout.yMargin
+                        |> viewMaybeInt
+                        |> Attr.value
                     ]
                     []
                 ]
@@ -262,8 +279,8 @@ itemView layout { dimensions } =
         [ Attr.style
             [ ( "border", "1px solid black" )
             , ( "display", "inline-block" )
-            , ( "margin", toString layout.yMargin ++ "px " ++ toString layout.xMargin ++ "px" )
-            , ( "width", toString layout.columnWidth ++ "px" )
+            , ( "margin", maybeIntToPx layout.yMargin 12 ++ " " ++ maybeIntToPx layout.xMargin 12 )
+            , ( "width", maybeIntToPx layout.columnWidth 240 )
             , ( "height", toString dimensions.height ++ "px" )
             ]
         ]
@@ -277,8 +294,16 @@ dimensionsStyle { height, width } =
     ]
 
 
-displayGeneratorCount : Maybe Int -> String
-displayGeneratorCount generatorCount =
-    generatorCount
+viewMaybeInt : Maybe Int -> String
+viewMaybeInt maybeInt =
+    maybeInt
         |> Maybe.map toString
         |> Maybe.withDefault ""
+
+
+maybeIntToPx : Maybe Int -> Int -> String
+maybeIntToPx maybeInt default =
+    maybeInt
+        |> Maybe.withDefault default
+        |> toString
+        |> flip (++) "px"
