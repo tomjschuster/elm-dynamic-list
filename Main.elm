@@ -1,6 +1,6 @@
 module Main exposing (main)
 
-import Html exposing (Html, button, code, div, footer, h1, header, input, main_, text)
+import Html exposing (Html, button, code, div, fieldset, footer, h1, h2, header, input, label, main_, p, text)
 import Html.Attributes as Attr
 import Html.Events as Events
 import Random
@@ -69,16 +69,12 @@ type alias Dimensions =
 type Msg
     = NoOp
     | UpdateGeneratorCount String
-    | UpdateLayout LayoutUpdate
     | GenerateRandomItem
     | SetItems (List Item)
     | ClearItems
-
-
-type LayoutUpdate
-    = UpdateColumnWidth Float
-    | UpdateXMargin Float
-    | UpdateYMargin Float
+    | UpdateColumnWidth String
+    | UpdateXMargin String
+    | UpdateYMargin String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -98,21 +94,42 @@ update msg model =
                     else
                         model => Cmd.none
 
-        UpdateLayout layoutUpdate ->
+        UpdateColumnWidth columnWidthStr ->
             let
                 { layout } =
                     model
 
+                columnWidth =
+                    Result.withDefault 240 (String.toFloat columnWidthStr)
+
                 updatedLayout =
-                    case layoutUpdate of
-                        UpdateColumnWidth columnWidth ->
-                            { layout | columnWidth = columnWidth }
+                    { layout | columnWidth = columnWidth }
+            in
+            { model | layout = updatedLayout } => Cmd.none
 
-                        UpdateXMargin xMargin ->
-                            { layout | xMargin = xMargin }
+        UpdateXMargin xMarginStr ->
+            let
+                { layout } =
+                    model
 
-                        UpdateYMargin yMargin ->
-                            { layout | yMargin = yMargin }
+                xMargin =
+                    Result.withDefault 0 (String.toFloat xMarginStr)
+
+                updatedLayout =
+                    { layout | xMargin = xMargin }
+            in
+            { model | layout = updatedLayout } => Cmd.none
+
+        UpdateYMargin yMarginStr ->
+            let
+                { layout } =
+                    model
+
+                yMargin =
+                    Result.withDefault 0 (String.toFloat yMarginStr)
+
+                updatedLayout =
+                    { layout | yMargin = yMargin }
             in
             { model | layout = updatedLayout } => Cmd.none
 
@@ -163,40 +180,60 @@ view : Model -> Html Msg
 view model =
     div
         []
-        [ header
-            []
-            [ h1 [] [ text "Elm Dynamic List" ]
+        [ header []
+            [ h1 [] [ text "Elm Dynamic List" ] ]
+        , main_ []
+            [ controlPanel model
+            , div [] (List.map itemView model.items)
             ]
-        , main_
-            []
-            [ div
-                []
-                [ input
+        , footer []
+            [ code
+                [ Attr.style [ ( "width", "500px" ), ( "display", "block" ) ] ]
+                [ text <| toString model ]
+            ]
+        ]
+
+
+controlPanel : Model -> Html Msg
+controlPanel model =
+    div []
+        [ fieldset [ Attr.style [ ( "display", "inline-block" ) ] ]
+            [ div []
+                [ label [ Attr.style [ ( "display", "block" ) ] ] [ text "Item Generator" ]
+                , input
                     [ model.generatorCount
                         |> displayGeneratorCount
                         |> Attr.value
                     , Events.onInput UpdateGeneratorCount
                     , Attr.type_ "number"
+                    , Attr.style [ ( "width", "50px" ) ]
                     ]
                     []
                 , button
                     [ Events.onClick GenerateRandomItem
                     , Attr.disabled (model.generatorCount == Nothing)
                     ]
-                    [ text "Generate Items" ]
+                    [ text "Generate" ]
                 , button
                     [ Events.onClick ClearItems
                     , Attr.disabled (List.isEmpty model.items)
                     ]
-                    [ text "Clear Items" ]
+                    [ text "Clear" ]
                 ]
-            , div [] (List.map itemView model.items)
             ]
-        , footer
-            []
-            [ code
-                [ Attr.style [ ( "width", "500px" ), ( "display", "block" ) ] ]
-                [ text <| toString model ]
+        , fieldset [ Attr.style [ ( "display", "inline-block" ) ] ]
+            [ div [ Attr.style [ ( "display", "inline-block" ) ] ]
+                [ label [ Attr.style [ ( "display", "block" ) ] ] [ text "Column Width" ]
+                , input [ Attr.style [ ( "width", "50px" ) ], Events.onInput UpdateColumnWidth, model.layout.columnWidth |> toString |> Attr.value ] []
+                ]
+            , div [ Attr.style [ ( "display", "inline-block" ) ] ]
+                [ label [ Attr.style [ ( "display", "block" ) ] ] [ text "X Margin" ]
+                , input [ Attr.style [ ( "width", "50px" ) ] ] []
+                ]
+            , div [ Attr.style [ ( "display", "inline-block" ) ] ]
+                [ label [ Attr.style [ ( "display", "block" ) ] ] [ text "Y Margin" ]
+                , input [ Attr.style [ ( "width", "50px" ) ] ] []
+                ]
             ]
         ]
 

@@ -9141,6 +9141,15 @@ var _tomjschuster$elm_dynamic_list$Main$itemGenerator = A2(
 		_elm_lang$core$Random$pair,
 		A2(_elm_lang$core$Random$float, 50, 500),
 		A2(_elm_lang$core$Random$float, 240, 240)));
+var _tomjschuster$elm_dynamic_list$Main$UpdateYMargin = function (a) {
+	return {ctor: 'UpdateYMargin', _0: a};
+};
+var _tomjschuster$elm_dynamic_list$Main$UpdateXMargin = function (a) {
+	return {ctor: 'UpdateXMargin', _0: a};
+};
+var _tomjschuster$elm_dynamic_list$Main$UpdateColumnWidth = function (a) {
+	return {ctor: 'UpdateColumnWidth', _0: a};
+};
 var _tomjschuster$elm_dynamic_list$Main$ClearItems = {ctor: 'ClearItems'};
 var _tomjschuster$elm_dynamic_list$Main$SetItems = function (a) {
 	return {ctor: 'SetItems', _0: a};
@@ -9182,26 +9191,48 @@ var _tomjschuster$elm_dynamic_list$Main$update = F2(
 							{generatorCount: _elm_lang$core$Maybe$Nothing}),
 						_elm_lang$core$Platform_Cmd$none) : A2(_tomjschuster$elm_dynamic_list$Main_ops['=>'], model, _elm_lang$core$Platform_Cmd$none);
 				}
-			case 'UpdateLayout':
+			case 'UpdateColumnWidth':
+				var columnWidth = A2(
+					_elm_lang$core$Result$withDefault,
+					240,
+					_elm_lang$core$String$toFloat(_p7._0));
 				var _p10 = model;
 				var layout = _p10.layout;
-				var updatedLayout = function () {
-					var _p11 = _p7._0;
-					switch (_p11.ctor) {
-						case 'UpdateColumnWidth':
-							return _elm_lang$core$Native_Utils.update(
-								layout,
-								{columnWidth: _p11._0});
-						case 'UpdateXMargin':
-							return _elm_lang$core$Native_Utils.update(
-								layout,
-								{xMargin: _p11._0});
-						default:
-							return _elm_lang$core$Native_Utils.update(
-								layout,
-								{yMargin: _p11._0});
-					}
-				}();
+				var updatedLayout = _elm_lang$core$Native_Utils.update(
+					layout,
+					{columnWidth: columnWidth});
+				return A2(
+					_tomjschuster$elm_dynamic_list$Main_ops['=>'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{layout: updatedLayout}),
+					_elm_lang$core$Platform_Cmd$none);
+			case 'UpdateXMargin':
+				var xMargin = A2(
+					_elm_lang$core$Result$withDefault,
+					0,
+					_elm_lang$core$String$toFloat(_p7._0));
+				var _p11 = model;
+				var layout = _p11.layout;
+				var updatedLayout = _elm_lang$core$Native_Utils.update(
+					layout,
+					{xMargin: xMargin});
+				return A2(
+					_tomjschuster$elm_dynamic_list$Main_ops['=>'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{layout: updatedLayout}),
+					_elm_lang$core$Platform_Cmd$none);
+			case 'UpdateYMargin':
+				var yMargin = A2(
+					_elm_lang$core$Result$withDefault,
+					0,
+					_elm_lang$core$String$toFloat(_p7._0));
+				var _p12 = model;
+				var layout = _p12.layout;
+				var updatedLayout = _elm_lang$core$Native_Utils.update(
+					layout,
+					{yMargin: yMargin});
 				return A2(
 					_tomjschuster$elm_dynamic_list$Main_ops['=>'],
 					_elm_lang$core$Native_Utils.update(
@@ -9209,20 +9240,20 @@ var _tomjschuster$elm_dynamic_list$Main$update = F2(
 						{layout: updatedLayout}),
 					_elm_lang$core$Platform_Cmd$none);
 			case 'GenerateRandomItem':
-				var _p12 = model.generatorCount;
-				if (_p12.ctor === 'Just') {
-					var _p13 = _p12._0;
+				var _p13 = model.generatorCount;
+				if (_p13.ctor === 'Just') {
+					var _p14 = _p13._0;
 					return A2(
 						_tomjschuster$elm_dynamic_list$Main_ops['=>'],
 						_elm_lang$core$Native_Utils.update(
 							model,
 							{
-								generatorCount: _elm_lang$core$Maybe$Just(_p13)
+								generatorCount: _elm_lang$core$Maybe$Just(_p14)
 							}),
 						A2(
 							_elm_lang$core$Random$generate,
 							_tomjschuster$elm_dynamic_list$Main$SetItems,
-							A2(_elm_lang$core$Random$list, _p13, _tomjschuster$elm_dynamic_list$Main$itemGenerator)));
+							A2(_elm_lang$core$Random$list, _p14, _tomjschuster$elm_dynamic_list$Main$itemGenerator)));
 				} else {
 					return A2(
 						_tomjschuster$elm_dynamic_list$Main_ops['=>'],
@@ -9250,11 +9281,307 @@ var _tomjschuster$elm_dynamic_list$Main$update = F2(
 		}
 	});
 var _tomjschuster$elm_dynamic_list$Main$GenerateRandomItem = {ctor: 'GenerateRandomItem'};
-var _tomjschuster$elm_dynamic_list$Main$UpdateLayout = function (a) {
-	return {ctor: 'UpdateLayout', _0: a};
-};
 var _tomjschuster$elm_dynamic_list$Main$UpdateGeneratorCount = function (a) {
 	return {ctor: 'UpdateGeneratorCount', _0: a};
+};
+var _tomjschuster$elm_dynamic_list$Main$controlPanel = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$fieldset,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$style(
+						{
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'display', _1: 'inline-block'},
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$label,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$style(
+										{
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: 'display', _1: 'block'},
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('Item Generator'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$input,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$value(
+											_tomjschuster$elm_dynamic_list$Main$displayGeneratorCount(model.generatorCount)),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Events$onInput(_tomjschuster$elm_dynamic_list$Main$UpdateGeneratorCount),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$type_('number'),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$style(
+														{
+															ctor: '::',
+															_0: {ctor: '_Tuple2', _0: 'width', _1: '50px'},
+															_1: {ctor: '[]'}
+														}),
+													_1: {ctor: '[]'}
+												}
+											}
+										}
+									},
+									{ctor: '[]'}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$button,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Events$onClick(_tomjschuster$elm_dynamic_list$Main$GenerateRandomItem),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$disabled(
+													_elm_lang$core$Native_Utils.eq(model.generatorCount, _elm_lang$core$Maybe$Nothing)),
+												_1: {ctor: '[]'}
+											}
+										},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text('Generate'),
+											_1: {ctor: '[]'}
+										}),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$button,
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Events$onClick(_tomjschuster$elm_dynamic_list$Main$ClearItems),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$disabled(
+														_elm_lang$core$List$isEmpty(model.items)),
+													_1: {ctor: '[]'}
+												}
+											},
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text('Clear'),
+												_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}),
+					_1: {ctor: '[]'}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$fieldset,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$style(
+							{
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'display', _1: 'inline-block'},
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$style(
+									{
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: 'display', _1: 'inline-block'},
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$label,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$style(
+											{
+												ctor: '::',
+												_0: {ctor: '_Tuple2', _0: 'display', _1: 'block'},
+												_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('Column Width'),
+										_1: {ctor: '[]'}
+									}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$input,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$style(
+												{
+													ctor: '::',
+													_0: {ctor: '_Tuple2', _0: 'width', _1: '50px'},
+													_1: {ctor: '[]'}
+												}),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Events$onInput(_tomjschuster$elm_dynamic_list$Main$UpdateColumnWidth),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$value(
+														_elm_lang$core$Basics$toString(model.layout.columnWidth)),
+													_1: {ctor: '[]'}
+												}
+											}
+										},
+										{ctor: '[]'}),
+									_1: {ctor: '[]'}
+								}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$div,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$style(
+										{
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: 'display', _1: 'inline-block'},
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$label,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$style(
+												{
+													ctor: '::',
+													_0: {ctor: '_Tuple2', _0: 'display', _1: 'block'},
+													_1: {ctor: '[]'}
+												}),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text('X Margin'),
+											_1: {ctor: '[]'}
+										}),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$input,
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$style(
+													{
+														ctor: '::',
+														_0: {ctor: '_Tuple2', _0: 'width', _1: '50px'},
+														_1: {ctor: '[]'}
+													}),
+												_1: {ctor: '[]'}
+											},
+											{ctor: '[]'}),
+										_1: {ctor: '[]'}
+									}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$div,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$style(
+											{
+												ctor: '::',
+												_0: {ctor: '_Tuple2', _0: 'display', _1: 'inline-block'},
+												_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$label,
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$style(
+													{
+														ctor: '::',
+														_0: {ctor: '_Tuple2', _0: 'display', _1: 'block'},
+														_1: {ctor: '[]'}
+													}),
+												_1: {ctor: '[]'}
+											},
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text('Y Margin'),
+												_1: {ctor: '[]'}
+											}),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$input,
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$style(
+														{
+															ctor: '::',
+															_0: {ctor: '_Tuple2', _0: 'width', _1: '50px'},
+															_1: {ctor: '[]'}
+														}),
+													_1: {ctor: '[]'}
+												},
+												{ctor: '[]'}),
+											_1: {ctor: '[]'}
+										}
+									}),
+								_1: {ctor: '[]'}
+							}
+						}
+					}),
+				_1: {ctor: '[]'}
+			}
+		});
 };
 var _tomjschuster$elm_dynamic_list$Main$view = function (model) {
 	return A2(
@@ -9284,70 +9611,7 @@ var _tomjschuster$elm_dynamic_list$Main$view = function (model) {
 					{ctor: '[]'},
 					{
 						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$div,
-							{ctor: '[]'},
-							{
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$input,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$value(
-											_tomjschuster$elm_dynamic_list$Main$displayGeneratorCount(model.generatorCount)),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$html$Html_Events$onInput(_tomjschuster$elm_dynamic_list$Main$UpdateGeneratorCount),
-											_1: {
-												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$type_('number'),
-												_1: {ctor: '[]'}
-											}
-										}
-									},
-									{ctor: '[]'}),
-								_1: {
-									ctor: '::',
-									_0: A2(
-										_elm_lang$html$Html$button,
-										{
-											ctor: '::',
-											_0: _elm_lang$html$Html_Events$onClick(_tomjschuster$elm_dynamic_list$Main$GenerateRandomItem),
-											_1: {
-												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$disabled(
-													_elm_lang$core$Native_Utils.eq(model.generatorCount, _elm_lang$core$Maybe$Nothing)),
-												_1: {ctor: '[]'}
-											}
-										},
-										{
-											ctor: '::',
-											_0: _elm_lang$html$Html$text('Generate Items'),
-											_1: {ctor: '[]'}
-										}),
-									_1: {
-										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$button,
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html_Events$onClick(_tomjschuster$elm_dynamic_list$Main$ClearItems),
-												_1: {
-													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$disabled(
-														_elm_lang$core$List$isEmpty(model.items)),
-													_1: {ctor: '[]'}
-												}
-											},
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html$text('Clear Items'),
-												_1: {ctor: '[]'}
-											}),
-										_1: {ctor: '[]'}
-									}
-								}
-							}),
+						_0: _tomjschuster$elm_dynamic_list$Main$controlPanel(model),
 						_1: {
 							ctor: '::',
 							_0: A2(
@@ -9396,15 +9660,6 @@ var _tomjschuster$elm_dynamic_list$Main$view = function (model) {
 var _tomjschuster$elm_dynamic_list$Main$main = _elm_lang$html$Html$program(
 	{init: _tomjschuster$elm_dynamic_list$Main$init, update: _tomjschuster$elm_dynamic_list$Main$update, subscriptions: _tomjschuster$elm_dynamic_list$Main$subscriptions, view: _tomjschuster$elm_dynamic_list$Main$view})();
 var _tomjschuster$elm_dynamic_list$Main$NoOp = {ctor: 'NoOp'};
-var _tomjschuster$elm_dynamic_list$Main$UpdateYMargin = function (a) {
-	return {ctor: 'UpdateYMargin', _0: a};
-};
-var _tomjschuster$elm_dynamic_list$Main$UpdateXMargin = function (a) {
-	return {ctor: 'UpdateXMargin', _0: a};
-};
-var _tomjschuster$elm_dynamic_list$Main$UpdateColumnWidth = function (a) {
-	return {ctor: 'UpdateColumnWidth', _0: a};
-};
 
 var Elm = {};
 Elm['Main'] = Elm['Main'] || {};
