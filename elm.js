@@ -9083,26 +9083,66 @@ var _tomjschuster$elm_dynamic_list$Main$dimensionsStyle = function (_p0) {
 		}
 	};
 };
-var _tomjschuster$elm_dynamic_list$Main$itemView = function (_p2) {
-	var _p3 = _p2;
-	return A2(
-		_elm_lang$html$Html$div,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$style(
-				{
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'border', _1: '1px solid black'},
-					_1: {
+var _tomjschuster$elm_dynamic_list$Main$itemView = F2(
+	function (layout, _p2) {
+		var _p3 = _p2;
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$style(
+					{
 						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'display', _1: 'inline-block'},
-						_1: _tomjschuster$elm_dynamic_list$Main$dimensionsStyle(_p3.dimensions)
-					}
-				}),
-			_1: {ctor: '[]'}
-		},
-		{ctor: '[]'});
-};
+						_0: {ctor: '_Tuple2', _0: 'border', _1: '1px solid black'},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'display', _1: 'inline-block'},
+							_1: {
+								ctor: '::',
+								_0: {
+									ctor: '_Tuple2',
+									_0: 'margin',
+									_1: A2(
+										_elm_lang$core$Basics_ops['++'],
+										_elm_lang$core$Basics$toString(layout.yMargin),
+										A2(
+											_elm_lang$core$Basics_ops['++'],
+											'px ',
+											A2(
+												_elm_lang$core$Basics_ops['++'],
+												_elm_lang$core$Basics$toString(layout.xMargin),
+												'px')))
+								},
+								_1: {
+									ctor: '::',
+									_0: {
+										ctor: '_Tuple2',
+										_0: 'width',
+										_1: A2(
+											_elm_lang$core$Basics_ops['++'],
+											_elm_lang$core$Basics$toString(layout.columnWidth),
+											'px')
+									},
+									_1: {
+										ctor: '::',
+										_0: {
+											ctor: '_Tuple2',
+											_0: 'height',
+											_1: A2(
+												_elm_lang$core$Basics_ops['++'],
+												_elm_lang$core$Basics$toString(_p3.dimensions.height),
+												'px')
+										},
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}
+					}),
+				_1: {ctor: '[]'}
+			},
+			{ctor: '[]'});
+	});
 var _tomjschuster$elm_dynamic_list$Main$subscriptions = function (model) {
 	return _elm_lang$core$Platform_Sub$none;
 };
@@ -9131,16 +9171,21 @@ var _tomjschuster$elm_dynamic_list$Main$tupleToDimensions = function (_p4) {
 	var _p5 = _p4;
 	return A2(_tomjschuster$elm_dynamic_list$Main$Dimensions, _p5._0, _p5._1);
 };
-var _tomjschuster$elm_dynamic_list$Main$itemGenerator = A2(
-	_elm_lang$core$Random$map,
-	function (_p6) {
-		return _tomjschuster$elm_dynamic_list$Main$Item(
-			_tomjschuster$elm_dynamic_list$Main$tupleToDimensions(_p6));
-	},
-	A2(
-		_elm_lang$core$Random$pair,
-		A2(_elm_lang$core$Random$float, 50, 500),
-		A2(_elm_lang$core$Random$float, 240, 240)));
+var _tomjschuster$elm_dynamic_list$Main$itemGenerator = function (layout) {
+	return A2(
+		_elm_lang$core$Random$map,
+		function (_p6) {
+			return _tomjschuster$elm_dynamic_list$Main$Item(
+				_tomjschuster$elm_dynamic_list$Main$tupleToDimensions(_p6));
+		},
+		A2(
+			_elm_lang$core$Random$pair,
+			A2(_elm_lang$core$Random$float, 50, 500),
+			A2(
+				_elm_lang$core$Random$float,
+				_elm_lang$core$Basics$toFloat(layout.columnWidth),
+				_elm_lang$core$Basics$toFloat(layout.columnWidth))));
+};
 var _tomjschuster$elm_dynamic_list$Main$UpdateYMargin = function (a) {
 	return {ctor: 'UpdateYMargin', _0: a};
 };
@@ -9164,7 +9209,10 @@ var _tomjschuster$elm_dynamic_list$Main$init = A2(
 	A2(
 		_elm_lang$core$Random$generate,
 		_tomjschuster$elm_dynamic_list$Main$SetItems,
-		A2(_elm_lang$core$Random$list, 12, _tomjschuster$elm_dynamic_list$Main$itemGenerator)));
+		A2(
+			_elm_lang$core$Random$list,
+			12,
+			_tomjschuster$elm_dynamic_list$Main$itemGenerator(_tomjschuster$elm_dynamic_list$Main$defaultLayout))));
 var _tomjschuster$elm_dynamic_list$Main$update = F2(
 	function (msg, model) {
 		var _p7 = msg;
@@ -9195,7 +9243,7 @@ var _tomjschuster$elm_dynamic_list$Main$update = F2(
 				var columnWidth = A2(
 					_elm_lang$core$Result$withDefault,
 					240,
-					_elm_lang$core$String$toFloat(_p7._0));
+					_elm_lang$core$String$toInt(_p7._0));
 				var _p10 = model;
 				var layout = _p10.layout;
 				var updatedLayout = _elm_lang$core$Native_Utils.update(
@@ -9211,7 +9259,7 @@ var _tomjschuster$elm_dynamic_list$Main$update = F2(
 				var xMargin = A2(
 					_elm_lang$core$Result$withDefault,
 					0,
-					_elm_lang$core$String$toFloat(_p7._0));
+					_elm_lang$core$String$toInt(_p7._0));
 				var _p11 = model;
 				var layout = _p11.layout;
 				var updatedLayout = _elm_lang$core$Native_Utils.update(
@@ -9227,7 +9275,7 @@ var _tomjschuster$elm_dynamic_list$Main$update = F2(
 				var yMargin = A2(
 					_elm_lang$core$Result$withDefault,
 					0,
-					_elm_lang$core$String$toFloat(_p7._0));
+					_elm_lang$core$String$toInt(_p7._0));
 				var _p12 = model;
 				var layout = _p12.layout;
 				var updatedLayout = _elm_lang$core$Native_Utils.update(
@@ -9253,7 +9301,10 @@ var _tomjschuster$elm_dynamic_list$Main$update = F2(
 						A2(
 							_elm_lang$core$Random$generate,
 							_tomjschuster$elm_dynamic_list$Main$SetItems,
-							A2(_elm_lang$core$Random$list, _p14, _tomjschuster$elm_dynamic_list$Main$itemGenerator)));
+							A2(
+								_elm_lang$core$Random$list,
+								_p14,
+								_tomjschuster$elm_dynamic_list$Main$itemGenerator(model.layout))));
 				} else {
 					return A2(
 						_tomjschuster$elm_dynamic_list$Main_ops['=>'],
@@ -9460,12 +9511,16 @@ var _tomjschuster$elm_dynamic_list$Main$controlPanel = function (model) {
 												}),
 											_1: {
 												ctor: '::',
-												_0: _elm_lang$html$Html_Events$onInput(_tomjschuster$elm_dynamic_list$Main$UpdateColumnWidth),
+												_0: _elm_lang$html$Html_Attributes$type_('number'),
 												_1: {
 													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$value(
-														_elm_lang$core$Basics$toString(model.layout.columnWidth)),
-													_1: {ctor: '[]'}
+													_0: _elm_lang$html$Html_Events$onInput(_tomjschuster$elm_dynamic_list$Main$UpdateColumnWidth),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$value(
+															_elm_lang$core$Basics$toString(model.layout.columnWidth)),
+														_1: {ctor: '[]'}
+													}
 												}
 											}
 										},
@@ -9518,7 +9573,20 @@ var _tomjschuster$elm_dynamic_list$Main$controlPanel = function (model) {
 														_0: {ctor: '_Tuple2', _0: 'width', _1: '50px'},
 														_1: {ctor: '[]'}
 													}),
-												_1: {ctor: '[]'}
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$type_('number'),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$html$Html_Events$onInput(_tomjschuster$elm_dynamic_list$Main$UpdateXMargin),
+														_1: {
+															ctor: '::',
+															_0: _elm_lang$html$Html_Attributes$value(
+																_elm_lang$core$Basics$toString(model.layout.xMargin)),
+															_1: {ctor: '[]'}
+														}
+													}
+												}
 											},
 											{ctor: '[]'}),
 										_1: {ctor: '[]'}
@@ -9569,7 +9637,20 @@ var _tomjschuster$elm_dynamic_list$Main$controlPanel = function (model) {
 															_0: {ctor: '_Tuple2', _0: 'width', _1: '50px'},
 															_1: {ctor: '[]'}
 														}),
-													_1: {ctor: '[]'}
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$type_('number'),
+														_1: {
+															ctor: '::',
+															_0: _elm_lang$html$Html_Events$onInput(_tomjschuster$elm_dynamic_list$Main$UpdateYMargin),
+															_1: {
+																ctor: '::',
+																_0: _elm_lang$html$Html_Attributes$value(
+																	_elm_lang$core$Basics$toString(model.layout.yMargin)),
+																_1: {ctor: '[]'}
+															}
+														}
+													}
 												},
 												{ctor: '[]'}),
 											_1: {ctor: '[]'}
@@ -9617,7 +9698,10 @@ var _tomjschuster$elm_dynamic_list$Main$view = function (model) {
 							_0: A2(
 								_elm_lang$html$Html$div,
 								{ctor: '[]'},
-								A2(_elm_lang$core$List$map, _tomjschuster$elm_dynamic_list$Main$itemView, model.items)),
+								A2(
+									_elm_lang$core$List$map,
+									_tomjschuster$elm_dynamic_list$Main$itemView(model.layout),
+									model.items)),
 							_1: {ctor: '[]'}
 						}
 					}),

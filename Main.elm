@@ -36,13 +36,13 @@ type alias Model =
 init : ( Model, Cmd Msg )
 init =
     Model Nothing defaultLayout []
-        => (Random.list 12 itemGenerator |> Random.generate SetItems)
+        => (Random.list 12 (itemGenerator defaultLayout) |> Random.generate SetItems)
 
 
 type alias Layout =
-    { columnWidth : Float
-    , xMargin : Float
-    , yMargin : Float
+    { columnWidth : Int
+    , xMargin : Int
+    , yMargin : Int
     }
 
 
@@ -100,7 +100,7 @@ update msg model =
                     model
 
                 columnWidth =
-                    Result.withDefault 240 (String.toFloat columnWidthStr)
+                    Result.withDefault 240 (String.toInt columnWidthStr)
 
                 updatedLayout =
                     { layout | columnWidth = columnWidth }
@@ -113,7 +113,7 @@ update msg model =
                     model
 
                 xMargin =
-                    Result.withDefault 0 (String.toFloat xMarginStr)
+                    Result.withDefault 0 (String.toInt xMarginStr)
 
                 updatedLayout =
                     { layout | xMargin = xMargin }
@@ -126,7 +126,7 @@ update msg model =
                     model
 
                 yMargin =
-                    Result.withDefault 0 (String.toFloat yMarginStr)
+                    Result.withDefault 0 (String.toInt yMarginStr)
 
                 updatedLayout =
                     { layout | yMargin = yMargin }
@@ -137,7 +137,7 @@ update msg model =
             case model.generatorCount of
                 Just generatorCount ->
                     { model | generatorCount = Just generatorCount }
-                        => (Random.list generatorCount itemGenerator |> Random.generate SetItems)
+                        => (Random.list generatorCount (itemGenerator model.layout) |> Random.generate SetItems)
 
                 Nothing ->
                     { model | generatorCount = Nothing }
@@ -155,11 +155,11 @@ tupleToDimensions ( height, width ) =
     Dimensions height width
 
 
-itemGenerator : Random.Generator Item
-itemGenerator =
+itemGenerator : Layout -> Random.Generator Item
+itemGenerator layout =
     Random.pair
         (Random.float 50 500)
-        (Random.float 240 240)
+        (Random.float (toFloat layout.columnWidth) (toFloat layout.columnWidth))
         |> Random.map (tupleToDimensions >> Item)
 
 
@@ -184,7 +184,7 @@ view model =
             [ h1 [] [ text "Elm Dynamic List" ] ]
         , main_ []
             [ controlPanel model
-            , div [] (List.map itemView model.items)
+            , div [] (List.map (itemView model.layout) model.items)
             ]
         , footer []
             [ code
@@ -224,27 +224,48 @@ controlPanel model =
         , fieldset [ Attr.style [ ( "display", "inline-block" ) ] ]
             [ div [ Attr.style [ ( "display", "inline-block" ) ] ]
                 [ label [ Attr.style [ ( "display", "block" ) ] ] [ text "Column Width" ]
-                , input [ Attr.style [ ( "width", "50px" ) ], Events.onInput UpdateColumnWidth, model.layout.columnWidth |> toString |> Attr.value ] []
+                , input
+                    [ Attr.style [ ( "width", "50px" ) ]
+                    , Attr.type_ "number"
+                    , Events.onInput UpdateColumnWidth
+                    , model.layout.columnWidth |> toString |> Attr.value
+                    ]
+                    []
                 ]
             , div [ Attr.style [ ( "display", "inline-block" ) ] ]
                 [ label [ Attr.style [ ( "display", "block" ) ] ] [ text "X Margin" ]
-                , input [ Attr.style [ ( "width", "50px" ) ] ] []
+                , input
+                    [ Attr.style [ ( "width", "50px" ) ]
+                    , Attr.type_ "number"
+                    , Events.onInput UpdateXMargin
+                    , model.layout.xMargin |> toString |> Attr.value
+                    ]
+                    []
                 ]
             , div [ Attr.style [ ( "display", "inline-block" ) ] ]
                 [ label [ Attr.style [ ( "display", "block" ) ] ] [ text "Y Margin" ]
-                , input [ Attr.style [ ( "width", "50px" ) ] ] []
+                , input
+                    [ Attr.style [ ( "width", "50px" ) ]
+                    , Attr.type_ "number"
+                    , Events.onInput UpdateYMargin
+                    , model.layout.yMargin |> toString |> Attr.value
+                    ]
+                    []
                 ]
             ]
         ]
 
 
-itemView : Item -> Html Msg
-itemView { dimensions } =
+itemView : Layout -> Item -> Html Msg
+itemView layout { dimensions } =
     div
-        [ ( "border", "1px solid black" )
-            :: ( "display", "inline-block" )
-            :: dimensionsStyle dimensions
-            |> Attr.style
+        [ Attr.style
+            [ ( "border", "1px solid black" )
+            , ( "display", "inline-block" )
+            , ( "margin", toString layout.yMargin ++ "px " ++ toString layout.xMargin ++ "px" )
+            , ( "width", toString layout.columnWidth ++ "px" )
+            , ( "height", toString dimensions.height ++ "px" )
+            ]
         ]
         []
 
