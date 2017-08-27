@@ -9215,7 +9215,7 @@ var _tomjschuster$elm_dynamic_list$Main$init = A2(
 	_tomjschuster$elm_dynamic_list$Main_ops['=>'],
 	A3(
 		_tomjschuster$elm_dynamic_list$Main$Model,
-		_elm_lang$core$Maybe$Nothing,
+		_elm_lang$core$Maybe$Just(12),
 		_tomjschuster$elm_dynamic_list$Main$defaultLayout,
 		{ctor: '[]'}),
 	A2(
@@ -9232,34 +9232,27 @@ var _tomjschuster$elm_dynamic_list$Main$update = F2(
 			case 'NoOp':
 				return A2(_tomjschuster$elm_dynamic_list$Main_ops['=>'], model, _elm_lang$core$Platform_Cmd$none);
 			case 'UpdateGeneratorCount':
-				var _p9 = _p7._0;
-				var _p8 = _elm_lang$core$String$toInt(_p9);
-				if (_p8.ctor === 'Ok') {
-					return A2(
-						_tomjschuster$elm_dynamic_list$Main_ops['=>'],
-						_elm_lang$core$Native_Utils.update(
-							model,
-							{
-								generatorCount: _elm_lang$core$Maybe$Just(_p8._0)
-							}),
-						_elm_lang$core$Platform_Cmd$none);
-				} else {
-					return _elm_lang$core$Native_Utils.eq(_p9, '') ? A2(
-						_tomjschuster$elm_dynamic_list$Main_ops['=>'],
-						_elm_lang$core$Native_Utils.update(
-							model,
-							{generatorCount: _elm_lang$core$Maybe$Nothing}),
-						_elm_lang$core$Platform_Cmd$none) : A2(_tomjschuster$elm_dynamic_list$Main_ops['=>'], model, _elm_lang$core$Platform_Cmd$none);
-				}
+				var _p8 = _p7._0;
+				var generatorCount = _elm_lang$core$Native_Utils.eq(_p8, '') ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(
+					A2(
+						_elm_lang$core$Result$withDefault,
+						12,
+						_elm_lang$core$String$toInt(_p8)));
+				return A2(
+					_tomjschuster$elm_dynamic_list$Main_ops['=>'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{generatorCount: generatorCount}),
+					_elm_lang$core$Platform_Cmd$none);
 			case 'UpdateColumnWidth':
-				var _p11 = _p7._0;
-				var columnWidth = _elm_lang$core$Native_Utils.eq(_p11, '') ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(
+				var _p10 = _p7._0;
+				var columnWidth = _elm_lang$core$Native_Utils.eq(_p10, '') ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(
 					A2(
 						_elm_lang$core$Result$withDefault,
 						240,
-						_elm_lang$core$String$toInt(_p11)));
-				var _p10 = model;
-				var layout = _p10.layout;
+						_elm_lang$core$String$toInt(_p10)));
+				var _p9 = model;
+				var layout = _p9.layout;
 				var updatedLayout = _elm_lang$core$Native_Utils.update(
 					layout,
 					{columnWidth: columnWidth});
@@ -9270,14 +9263,14 @@ var _tomjschuster$elm_dynamic_list$Main$update = F2(
 						{layout: updatedLayout}),
 					_elm_lang$core$Platform_Cmd$none);
 			case 'UpdateXMargin':
-				var _p13 = _p7._0;
-				var xMargin = _elm_lang$core$Native_Utils.eq(_p13, '') ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(
+				var _p12 = _p7._0;
+				var xMargin = _elm_lang$core$Native_Utils.eq(_p12, '') ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(
 					A2(
 						_elm_lang$core$Result$withDefault,
 						0,
-						_elm_lang$core$String$toInt(_p13)));
-				var _p12 = model;
-				var layout = _p12.layout;
+						_elm_lang$core$String$toInt(_p12)));
+				var _p11 = model;
+				var layout = _p11.layout;
 				var updatedLayout = _elm_lang$core$Native_Utils.update(
 					layout,
 					{xMargin: xMargin});
@@ -9288,14 +9281,14 @@ var _tomjschuster$elm_dynamic_list$Main$update = F2(
 						{layout: updatedLayout}),
 					_elm_lang$core$Platform_Cmd$none);
 			case 'UpdateYMargin':
-				var _p15 = _p7._0;
-				var yMargin = _elm_lang$core$Native_Utils.eq(_p15, '') ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(
+				var _p14 = _p7._0;
+				var yMargin = _elm_lang$core$Native_Utils.eq(_p14, '') ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(
 					A2(
 						_elm_lang$core$Result$withDefault,
 						0,
-						_elm_lang$core$String$toInt(_p15)));
-				var _p14 = model;
-				var layout = _p14.layout;
+						_elm_lang$core$String$toInt(_p14)));
+				var _p13 = model;
+				var layout = _p13.layout;
 				var updatedLayout = _elm_lang$core$Native_Utils.update(
 					layout,
 					{yMargin: yMargin});
@@ -9306,37 +9299,22 @@ var _tomjschuster$elm_dynamic_list$Main$update = F2(
 						{layout: updatedLayout}),
 					_elm_lang$core$Platform_Cmd$none);
 			case 'GenerateRandomItem':
-				var _p16 = model.generatorCount;
-				if (_p16.ctor === 'Just') {
-					var _p17 = _p16._0;
-					return A2(
-						_tomjschuster$elm_dynamic_list$Main_ops['=>'],
-						_elm_lang$core$Native_Utils.update(
-							model,
-							{
-								generatorCount: _elm_lang$core$Maybe$Just(_p17)
-							}),
+				return A2(
+					_tomjschuster$elm_dynamic_list$Main_ops['=>'],
+					model,
+					A2(
+						_elm_lang$core$Random$generate,
+						_tomjschuster$elm_dynamic_list$Main$SetItems,
 						A2(
-							_elm_lang$core$Random$generate,
-							_tomjschuster$elm_dynamic_list$Main$SetItems,
-							A2(
-								_elm_lang$core$Random$list,
-								_p17,
-								_tomjschuster$elm_dynamic_list$Main$itemGenerator(model.layout))));
-				} else {
-					return A2(
-						_tomjschuster$elm_dynamic_list$Main_ops['=>'],
-						_elm_lang$core$Native_Utils.update(
-							model,
-							{generatorCount: _elm_lang$core$Maybe$Nothing}),
-						_elm_lang$core$Platform_Cmd$none);
-				}
+							_elm_lang$core$Random$list,
+							A2(_elm_lang$core$Maybe$withDefault, 12, model.generatorCount),
+							_tomjschuster$elm_dynamic_list$Main$itemGenerator(model.layout))));
 			case 'SetItems':
 				return A2(
 					_tomjschuster$elm_dynamic_list$Main_ops['=>'],
 					_elm_lang$core$Native_Utils.update(
 						model,
-						{items: _p7._0, generatorCount: _elm_lang$core$Maybe$Nothing}),
+						{items: _p7._0}),
 					_elm_lang$core$Platform_Cmd$none);
 			default:
 				return A2(
@@ -9417,7 +9395,11 @@ var _tomjschuster$elm_dynamic_list$Main$controlPanel = function (model) {
 															_0: {ctor: '_Tuple2', _0: 'width', _1: '50px'},
 															_1: {ctor: '[]'}
 														}),
-													_1: {ctor: '[]'}
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$placeholder('12'),
+														_1: {ctor: '[]'}
+													}
 												}
 											}
 										}
@@ -9430,12 +9412,7 @@ var _tomjschuster$elm_dynamic_list$Main$controlPanel = function (model) {
 										{
 											ctor: '::',
 											_0: _elm_lang$html$Html_Events$onClick(_tomjschuster$elm_dynamic_list$Main$GenerateRandomItem),
-											_1: {
-												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$disabled(
-													_elm_lang$core$Native_Utils.eq(model.generatorCount, _elm_lang$core$Maybe$Nothing)),
-												_1: {ctor: '[]'}
-											}
+											_1: {ctor: '[]'}
 										},
 										{
 											ctor: '::',
@@ -9535,9 +9512,13 @@ var _tomjschuster$elm_dynamic_list$Main$controlPanel = function (model) {
 													_0: _elm_lang$html$Html_Events$onInput(_tomjschuster$elm_dynamic_list$Main$UpdateColumnWidth),
 													_1: {
 														ctor: '::',
-														_0: _elm_lang$html$Html_Attributes$value(
-															_tomjschuster$elm_dynamic_list$Main$viewMaybeInt(model.layout.columnWidth)),
-														_1: {ctor: '[]'}
+														_0: _elm_lang$html$Html_Attributes$placeholder('240'),
+														_1: {
+															ctor: '::',
+															_0: _elm_lang$html$Html_Attributes$value(
+																_tomjschuster$elm_dynamic_list$Main$viewMaybeInt(model.layout.columnWidth)),
+															_1: {ctor: '[]'}
+														}
 													}
 												}
 											}
@@ -9599,9 +9580,13 @@ var _tomjschuster$elm_dynamic_list$Main$controlPanel = function (model) {
 														_0: _elm_lang$html$Html_Events$onInput(_tomjschuster$elm_dynamic_list$Main$UpdateXMargin),
 														_1: {
 															ctor: '::',
-															_0: _elm_lang$html$Html_Attributes$value(
-																_tomjschuster$elm_dynamic_list$Main$viewMaybeInt(model.layout.xMargin)),
-															_1: {ctor: '[]'}
+															_0: _elm_lang$html$Html_Attributes$placeholder('12'),
+															_1: {
+																ctor: '::',
+																_0: _elm_lang$html$Html_Attributes$value(
+																	_tomjschuster$elm_dynamic_list$Main$viewMaybeInt(model.layout.xMargin)),
+																_1: {ctor: '[]'}
+															}
 														}
 													}
 												}
@@ -9663,9 +9648,13 @@ var _tomjschuster$elm_dynamic_list$Main$controlPanel = function (model) {
 															_0: _elm_lang$html$Html_Events$onInput(_tomjschuster$elm_dynamic_list$Main$UpdateYMargin),
 															_1: {
 																ctor: '::',
-																_0: _elm_lang$html$Html_Attributes$value(
-																	_tomjschuster$elm_dynamic_list$Main$viewMaybeInt(model.layout.yMargin)),
-																_1: {ctor: '[]'}
+																_0: _elm_lang$html$Html_Attributes$placeholder('12'),
+																_1: {
+																	ctor: '::',
+																	_0: _elm_lang$html$Html_Attributes$value(
+																		_tomjschuster$elm_dynamic_list$Main$viewMaybeInt(model.layout.yMargin)),
+																	_1: {ctor: '[]'}
+																}
 															}
 														}
 													}

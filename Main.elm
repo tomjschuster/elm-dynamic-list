@@ -35,7 +35,7 @@ type alias Model =
 
 init : ( Model, Cmd Msg )
 init =
-    Model Nothing defaultLayout []
+    Model (Just 12) defaultLayout []
         => (Random.list 12 (itemGenerator defaultLayout) |> Random.generate SetItems)
 
 
@@ -84,15 +84,14 @@ update msg model =
             model => Cmd.none
 
         UpdateGeneratorCount intString ->
-            case String.toInt intString of
-                Ok count ->
-                    { model | generatorCount = Just count } => Cmd.none
-
-                Err _ ->
+            let
+                generatorCount =
                     if intString == "" then
-                        { model | generatorCount = Nothing } => Cmd.none
+                        Nothing
                     else
-                        model => Cmd.none
+                        Result.withDefault 12 (String.toInt intString) |> Just
+            in
+            { model | generatorCount = generatorCount } => Cmd.none
 
         UpdateColumnWidth columnWidthStr ->
             let
@@ -145,17 +144,15 @@ update msg model =
             { model | layout = updatedLayout } => Cmd.none
 
         GenerateRandomItem ->
-            case model.generatorCount of
-                Just generatorCount ->
-                    { model | generatorCount = Just generatorCount }
-                        => (Random.list generatorCount (itemGenerator model.layout) |> Random.generate SetItems)
-
-                Nothing ->
-                    { model | generatorCount = Nothing }
-                        => Cmd.none
+            model
+                => (Random.list
+                        (Maybe.withDefault 12 model.generatorCount)
+                        (itemGenerator model.layout)
+                        |> Random.generate SetItems
+                   )
 
         SetItems items ->
-            { model | items = items, generatorCount = Nothing } => Cmd.none
+            { model | items = items } => Cmd.none
 
         ClearItems ->
             { model | items = [] } => Cmd.none
@@ -218,11 +215,11 @@ controlPanel model =
                     , Events.onInput UpdateGeneratorCount
                     , Attr.type_ "number"
                     , Attr.style [ ( "width", "50px" ) ]
+                    , Attr.placeholder "12"
                     ]
                     []
                 , button
                     [ Events.onClick GenerateRandomItem
-                    , Attr.disabled (model.generatorCount == Nothing)
                     ]
                     [ text "Generate" ]
                 , button
@@ -239,6 +236,7 @@ controlPanel model =
                     [ Attr.style [ ( "width", "50px" ) ]
                     , Attr.type_ "number"
                     , Events.onInput UpdateColumnWidth
+                    , Attr.placeholder "240"
                     , model.layout.columnWidth
                         |> viewMaybeInt
                         |> Attr.value
@@ -251,6 +249,7 @@ controlPanel model =
                     [ Attr.style [ ( "width", "50px" ) ]
                     , Attr.type_ "number"
                     , Events.onInput UpdateXMargin
+                    , Attr.placeholder "12"
                     , model.layout.xMargin
                         |> viewMaybeInt
                         |> Attr.value
@@ -263,6 +262,7 @@ controlPanel model =
                     [ Attr.style [ ( "width", "50px" ) ]
                     , Attr.type_ "number"
                     , Events.onInput UpdateYMargin
+                    , Attr.placeholder "12"
                     , model.layout.yMargin
                         |> viewMaybeInt
                         |> Attr.value
