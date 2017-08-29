@@ -9051,6 +9051,65 @@ var _elm_lang$html$Html_Events$Options = F2(
 		return {stopPropagation: a, preventDefault: b};
 	});
 
+var _tomjschuster$elm_dynamic_list$Config$stringToMaybeInt = F2(
+	function ($default, stringInt) {
+		return _elm_lang$core$Native_Utils.eq(stringInt, '') ? _elm_lang$core$Maybe$Nothing : A2(
+			_elm_lang$core$Result$withDefault,
+			$default,
+			A2(
+				_elm_lang$core$Result$map,
+				_elm_lang$core$Maybe$Just,
+				_elm_lang$core$String$toInt(stringInt)));
+	});
+var _tomjschuster$elm_dynamic_list$Config$defaultYMargin = 12;
+var _tomjschuster$elm_dynamic_list$Config$defaultXMargin = 12;
+var _tomjschuster$elm_dynamic_list$Config$defaultWidth = 240;
+var _tomjschuster$elm_dynamic_list$Config$Config = F3(
+	function (a, b, c) {
+		return {width: a, xMargin: b, yMargin: c};
+	});
+var _tomjschuster$elm_dynamic_list$Config$default = A3(
+	_tomjschuster$elm_dynamic_list$Config$Config,
+	_elm_lang$core$Maybe$Just(_tomjschuster$elm_dynamic_list$Config$defaultWidth),
+	_elm_lang$core$Maybe$Just(_tomjschuster$elm_dynamic_list$Config$defaultXMargin),
+	_elm_lang$core$Maybe$Just(_tomjschuster$elm_dynamic_list$Config$defaultYMargin));
+var _tomjschuster$elm_dynamic_list$Config$update = F2(
+	function (msg, config) {
+		var _p0 = msg;
+		switch (_p0.ctor) {
+			case 'NoOp':
+				return config;
+			case 'UpdateWidth':
+				return _elm_lang$core$Native_Utils.update(
+					config,
+					{
+						width: A2(_tomjschuster$elm_dynamic_list$Config$stringToMaybeInt, _tomjschuster$elm_dynamic_list$Config$default.width, _p0._0)
+					});
+			case 'UpdateXMargin':
+				return _elm_lang$core$Native_Utils.update(
+					config,
+					{
+						xMargin: A2(_tomjschuster$elm_dynamic_list$Config$stringToMaybeInt, _tomjschuster$elm_dynamic_list$Config$default.xMargin, _p0._0)
+					});
+			default:
+				return _elm_lang$core$Native_Utils.update(
+					config,
+					{
+						yMargin: A2(_tomjschuster$elm_dynamic_list$Config$stringToMaybeInt, _tomjschuster$elm_dynamic_list$Config$default.yMargin, _p0._0)
+					});
+		}
+	});
+var _tomjschuster$elm_dynamic_list$Config$UpdateYMargin = function (a) {
+	return {ctor: 'UpdateYMargin', _0: a};
+};
+var _tomjschuster$elm_dynamic_list$Config$UpdateXMargin = function (a) {
+	return {ctor: 'UpdateXMargin', _0: a};
+};
+var _tomjschuster$elm_dynamic_list$Config$UpdateWidth = function (a) {
+	return {ctor: 'UpdateWidth', _0: a};
+};
+var _tomjschuster$elm_dynamic_list$Config$NoOp = {ctor: 'NoOp'};
+
 var _tomjschuster$elm_dynamic_list$Main$maybeIntToPx = F2(
 	function (maybeInt, $default) {
 		return A3(
@@ -9096,7 +9155,7 @@ var _tomjschuster$elm_dynamic_list$Main$dimensionsStyle = function (_p0) {
 	};
 };
 var _tomjschuster$elm_dynamic_list$Main$itemView = F2(
-	function (layout, _p2) {
+	function (config, _p2) {
 		var _p3 = _p2;
 		return A2(
 			_elm_lang$html$Html$div,
@@ -9116,18 +9175,18 @@ var _tomjschuster$elm_dynamic_list$Main$itemView = F2(
 									_0: 'margin',
 									_1: A2(
 										_elm_lang$core$Basics_ops['++'],
-										A2(_tomjschuster$elm_dynamic_list$Main$maybeIntToPx, layout.yMargin, 12),
+										A2(_tomjschuster$elm_dynamic_list$Main$maybeIntToPx, config.yMargin, _tomjschuster$elm_dynamic_list$Config$defaultYMargin),
 										A2(
 											_elm_lang$core$Basics_ops['++'],
 											' ',
-											A2(_tomjschuster$elm_dynamic_list$Main$maybeIntToPx, layout.xMargin, 12)))
+											A2(_tomjschuster$elm_dynamic_list$Main$maybeIntToPx, config.xMargin, _tomjschuster$elm_dynamic_list$Config$defaultXMargin)))
 								},
 								_1: {
 									ctor: '::',
 									_0: {
 										ctor: '_Tuple2',
 										_0: 'width',
-										_1: A2(_tomjschuster$elm_dynamic_list$Main$maybeIntToPx, layout.columnWidth, 240)
+										_1: A2(_tomjschuster$elm_dynamic_list$Main$maybeIntToPx, config.width, _tomjschuster$elm_dynamic_list$Config$defaultWidth)
 									},
 									_1: {
 										ctor: '::',
@@ -9159,17 +9218,8 @@ _tomjschuster$elm_dynamic_list$Main_ops['=>'] = F2(
 	});
 var _tomjschuster$elm_dynamic_list$Main$Model = F3(
 	function (a, b, c) {
-		return {generatorCount: a, layout: b, items: c};
+		return {generatorCount: a, config: b, items: c};
 	});
-var _tomjschuster$elm_dynamic_list$Main$Layout = F3(
-	function (a, b, c) {
-		return {columnWidth: a, xMargin: b, yMargin: c};
-	});
-var _tomjschuster$elm_dynamic_list$Main$defaultLayout = A3(
-	_tomjschuster$elm_dynamic_list$Main$Layout,
-	_elm_lang$core$Maybe$Just(240),
-	_elm_lang$core$Maybe$Just(12),
-	_elm_lang$core$Maybe$Just(12));
 var _tomjschuster$elm_dynamic_list$Main$Item = function (a) {
 	return {dimensions: a};
 };
@@ -9181,7 +9231,8 @@ var _tomjschuster$elm_dynamic_list$Main$tupleToDimensions = function (_p4) {
 	var _p5 = _p4;
 	return A2(_tomjschuster$elm_dynamic_list$Main$Dimensions, _p5._0, _p5._1);
 };
-var _tomjschuster$elm_dynamic_list$Main$itemGenerator = function (layout) {
+var _tomjschuster$elm_dynamic_list$Main$itemGenerator = function (config) {
+	var width = _elm_lang$core$Basics$toFloat(_tomjschuster$elm_dynamic_list$Config$defaultWidth);
 	return A2(
 		_elm_lang$core$Random$map,
 		function (_p6) {
@@ -9191,21 +9242,10 @@ var _tomjschuster$elm_dynamic_list$Main$itemGenerator = function (layout) {
 		A2(
 			_elm_lang$core$Random$pair,
 			A2(_elm_lang$core$Random$float, 50, 500),
-			A2(
-				_elm_lang$core$Random$float,
-				_elm_lang$core$Basics$toFloat(
-					A2(_elm_lang$core$Maybe$withDefault, 240, layout.columnWidth)),
-				_elm_lang$core$Basics$toFloat(
-					A2(_elm_lang$core$Maybe$withDefault, 240, layout.columnWidth)))));
+			A2(_elm_lang$core$Random$float, width, width)));
 };
-var _tomjschuster$elm_dynamic_list$Main$UpdateYMargin = function (a) {
-	return {ctor: 'UpdateYMargin', _0: a};
-};
-var _tomjschuster$elm_dynamic_list$Main$UpdateXMargin = function (a) {
-	return {ctor: 'UpdateXMargin', _0: a};
-};
-var _tomjschuster$elm_dynamic_list$Main$UpdateColumnWidth = function (a) {
-	return {ctor: 'UpdateColumnWidth', _0: a};
+var _tomjschuster$elm_dynamic_list$Main$UpdateConfig = function (a) {
+	return {ctor: 'UpdateConfig', _0: a};
 };
 var _tomjschuster$elm_dynamic_list$Main$ClearItems = {ctor: 'ClearItems'};
 var _tomjschuster$elm_dynamic_list$Main$SetItems = function (a) {
@@ -9216,7 +9256,7 @@ var _tomjschuster$elm_dynamic_list$Main$init = A2(
 	A3(
 		_tomjschuster$elm_dynamic_list$Main$Model,
 		_elm_lang$core$Maybe$Just(12),
-		_tomjschuster$elm_dynamic_list$Main$defaultLayout,
+		_tomjschuster$elm_dynamic_list$Config$default,
 		{ctor: '[]'}),
 	A2(
 		_elm_lang$core$Random$generate,
@@ -9224,7 +9264,7 @@ var _tomjschuster$elm_dynamic_list$Main$init = A2(
 		A2(
 			_elm_lang$core$Random$list,
 			12,
-			_tomjschuster$elm_dynamic_list$Main$itemGenerator(_tomjschuster$elm_dynamic_list$Main$defaultLayout))));
+			_tomjschuster$elm_dynamic_list$Main$itemGenerator(_tomjschuster$elm_dynamic_list$Config$default))));
 var _tomjschuster$elm_dynamic_list$Main$update = F2(
 	function (msg, model) {
 		var _p7 = msg;
@@ -9244,59 +9284,14 @@ var _tomjschuster$elm_dynamic_list$Main$update = F2(
 						model,
 						{generatorCount: generatorCount}),
 					_elm_lang$core$Platform_Cmd$none);
-			case 'UpdateColumnWidth':
-				var _p10 = _p7._0;
-				var columnWidth = _elm_lang$core$Native_Utils.eq(_p10, '') ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(
-					A2(
-						_elm_lang$core$Result$withDefault,
-						240,
-						_elm_lang$core$String$toInt(_p10)));
-				var _p9 = model;
-				var layout = _p9.layout;
-				var updatedLayout = _elm_lang$core$Native_Utils.update(
-					layout,
-					{columnWidth: columnWidth});
+			case 'UpdateConfig':
 				return A2(
 					_tomjschuster$elm_dynamic_list$Main_ops['=>'],
 					_elm_lang$core$Native_Utils.update(
 						model,
-						{layout: updatedLayout}),
-					_elm_lang$core$Platform_Cmd$none);
-			case 'UpdateXMargin':
-				var _p12 = _p7._0;
-				var xMargin = _elm_lang$core$Native_Utils.eq(_p12, '') ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(
-					A2(
-						_elm_lang$core$Result$withDefault,
-						0,
-						_elm_lang$core$String$toInt(_p12)));
-				var _p11 = model;
-				var layout = _p11.layout;
-				var updatedLayout = _elm_lang$core$Native_Utils.update(
-					layout,
-					{xMargin: xMargin});
-				return A2(
-					_tomjschuster$elm_dynamic_list$Main_ops['=>'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{layout: updatedLayout}),
-					_elm_lang$core$Platform_Cmd$none);
-			case 'UpdateYMargin':
-				var _p14 = _p7._0;
-				var yMargin = _elm_lang$core$Native_Utils.eq(_p14, '') ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(
-					A2(
-						_elm_lang$core$Result$withDefault,
-						0,
-						_elm_lang$core$String$toInt(_p14)));
-				var _p13 = model;
-				var layout = _p13.layout;
-				var updatedLayout = _elm_lang$core$Native_Utils.update(
-					layout,
-					{yMargin: yMargin});
-				return A2(
-					_tomjschuster$elm_dynamic_list$Main_ops['=>'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{layout: updatedLayout}),
+						{
+							config: A2(_tomjschuster$elm_dynamic_list$Config$update, _p7._0, model.config)
+						}),
 					_elm_lang$core$Platform_Cmd$none);
 			case 'GenerateRandomItem':
 				return A2(
@@ -9308,7 +9303,7 @@ var _tomjschuster$elm_dynamic_list$Main$update = F2(
 						A2(
 							_elm_lang$core$Random$list,
 							A2(_elm_lang$core$Maybe$withDefault, 12, model.generatorCount),
-							_tomjschuster$elm_dynamic_list$Main$itemGenerator(model.layout))));
+							_tomjschuster$elm_dynamic_list$Main$itemGenerator(model.config))));
 			case 'SetItems':
 				return A2(
 					_tomjschuster$elm_dynamic_list$Main_ops['=>'],
@@ -9509,14 +9504,17 @@ var _tomjschuster$elm_dynamic_list$Main$controlPanel = function (model) {
 												_0: _elm_lang$html$Html_Attributes$type_('number'),
 												_1: {
 													ctor: '::',
-													_0: _elm_lang$html$Html_Events$onInput(_tomjschuster$elm_dynamic_list$Main$UpdateColumnWidth),
+													_0: A2(
+														_elm_lang$html$Html_Attributes$map,
+														_tomjschuster$elm_dynamic_list$Main$UpdateConfig,
+														_elm_lang$html$Html_Events$onInput(_tomjschuster$elm_dynamic_list$Config$UpdateWidth)),
 													_1: {
 														ctor: '::',
 														_0: _elm_lang$html$Html_Attributes$placeholder('240'),
 														_1: {
 															ctor: '::',
 															_0: _elm_lang$html$Html_Attributes$value(
-																_tomjschuster$elm_dynamic_list$Main$viewMaybeInt(model.layout.columnWidth)),
+																_tomjschuster$elm_dynamic_list$Main$viewMaybeInt(model.config.width)),
 															_1: {ctor: '[]'}
 														}
 													}
@@ -9577,14 +9575,17 @@ var _tomjschuster$elm_dynamic_list$Main$controlPanel = function (model) {
 													_0: _elm_lang$html$Html_Attributes$type_('number'),
 													_1: {
 														ctor: '::',
-														_0: _elm_lang$html$Html_Events$onInput(_tomjschuster$elm_dynamic_list$Main$UpdateXMargin),
+														_0: A2(
+															_elm_lang$html$Html_Attributes$map,
+															_tomjschuster$elm_dynamic_list$Main$UpdateConfig,
+															_elm_lang$html$Html_Events$onInput(_tomjschuster$elm_dynamic_list$Config$UpdateXMargin)),
 														_1: {
 															ctor: '::',
 															_0: _elm_lang$html$Html_Attributes$placeholder('12'),
 															_1: {
 																ctor: '::',
 																_0: _elm_lang$html$Html_Attributes$value(
-																	_tomjschuster$elm_dynamic_list$Main$viewMaybeInt(model.layout.xMargin)),
+																	_tomjschuster$elm_dynamic_list$Main$viewMaybeInt(model.config.xMargin)),
 																_1: {ctor: '[]'}
 															}
 														}
@@ -9645,14 +9646,17 @@ var _tomjschuster$elm_dynamic_list$Main$controlPanel = function (model) {
 														_0: _elm_lang$html$Html_Attributes$type_('number'),
 														_1: {
 															ctor: '::',
-															_0: _elm_lang$html$Html_Events$onInput(_tomjschuster$elm_dynamic_list$Main$UpdateYMargin),
+															_0: A2(
+																_elm_lang$html$Html_Attributes$map,
+																_tomjschuster$elm_dynamic_list$Main$UpdateConfig,
+																_elm_lang$html$Html_Events$onInput(_tomjschuster$elm_dynamic_list$Config$UpdateYMargin)),
 															_1: {
 																ctor: '::',
 																_0: _elm_lang$html$Html_Attributes$placeholder('12'),
 																_1: {
 																	ctor: '::',
 																	_0: _elm_lang$html$Html_Attributes$value(
-																		_tomjschuster$elm_dynamic_list$Main$viewMaybeInt(model.layout.yMargin)),
+																		_tomjschuster$elm_dynamic_list$Main$viewMaybeInt(model.config.yMargin)),
 																	_1: {ctor: '[]'}
 																}
 															}
@@ -9707,7 +9711,7 @@ var _tomjschuster$elm_dynamic_list$Main$view = function (model) {
 								{ctor: '[]'},
 								A2(
 									_elm_lang$core$List$map,
-									_tomjschuster$elm_dynamic_list$Main$itemView(model.layout),
+									_tomjschuster$elm_dynamic_list$Main$itemView(model.config),
 									model.items)),
 							_1: {ctor: '[]'}
 						}

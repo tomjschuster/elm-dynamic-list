@@ -1,5 +1,6 @@
 module Main exposing (main)
 
+import Config exposing (Config)
 import Html exposing (Html, button, code, div, fieldset, footer, h1, h2, header, input, label, main_, p, text)
 import Html.Attributes as Attr
 import Html.Events as Events
@@ -28,27 +29,15 @@ infixr 9 =>
 
 type alias Model =
     { generatorCount : Maybe Int
-    , layout : Layout
+    , config : Config
     , items : List Item
     }
 
 
 init : ( Model, Cmd Msg )
 init =
-    Model (Just 12) defaultLayout []
-        => (Random.list 12 (itemGenerator defaultLayout) |> Random.generate SetItems)
-
-
-type alias Layout =
-    { columnWidth : Maybe Int
-    , xMargin : Maybe Int
-    , yMargin : Maybe Int
-    }
-
-
-defaultLayout : Layout
-defaultLayout =
-    Layout (Just 240) (Just 12) (Just 12)
+    Model (Just 12) Config.default []
+        => (Random.list 12 (itemGenerator Config.default) |> Random.generate SetItems)
 
 
 type alias Item =
@@ -72,9 +61,7 @@ type Msg
     | GenerateRandomItem
     | SetItems (List Item)
     | ClearItems
-    | UpdateColumnWidth String
-    | UpdateXMargin String
-    | UpdateYMargin String
+    | UpdateConfig Config.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -93,61 +80,14 @@ update msg model =
             in
             { model | generatorCount = generatorCount } => Cmd.none
 
-        UpdateColumnWidth columnWidthStr ->
-            let
-                { layout } =
-                    model
-
-                columnWidth =
-                    if columnWidthStr == "" then
-                        Nothing
-                    else
-                        Just (Result.withDefault 240 (String.toInt columnWidthStr))
-
-                updatedLayout =
-                    { layout | columnWidth = columnWidth }
-            in
-            { model | layout = updatedLayout } => Cmd.none
-
-        UpdateXMargin xMarginStr ->
-            let
-                { layout } =
-                    model
-
-                xMargin =
-                    if xMarginStr == "" then
-                        Nothing
-                    else
-                        Just
-                            (Result.withDefault 0 (String.toInt xMarginStr))
-
-                updatedLayout =
-                    { layout | xMargin = xMargin }
-            in
-            { model | layout = updatedLayout } => Cmd.none
-
-        UpdateYMargin yMarginStr ->
-            let
-                { layout } =
-                    model
-
-                yMargin =
-                    if yMarginStr == "" then
-                        Nothing
-                    else
-                        Just
-                            (Result.withDefault 0 (String.toInt yMarginStr))
-
-                updatedLayout =
-                    { layout | yMargin = yMargin }
-            in
-            { model | layout = updatedLayout } => Cmd.none
+        UpdateConfig configMsg ->
+            { model | config = Config.update configMsg model.config } => Cmd.none
 
         GenerateRandomItem ->
             model
                 => (Random.list
                         (Maybe.withDefault 12 model.generatorCount)
-                        (itemGenerator model.layout)
+                        (itemGenerator model.config)
                         |> Random.generate SetItems
                    )
 
@@ -163,11 +103,15 @@ tupleToDimensions ( height, width ) =
     Dimensions height width
 
 
-itemGenerator : Layout -> Random.Generator Item
-itemGenerator layout =
+itemGenerator : Config -> Random.Generator Item
+itemGenerator config =
+    let
+        width =
+            Config.defaultWidth |> toFloat
+    in
     Random.pair
         (Random.float 50 500)
-        (Random.float (toFloat (Maybe.withDefault 240 layout.columnWidth)) (toFloat (Maybe.withDefault 240 layout.columnWidth)))
+        (Random.float width width)
         |> Random.map (tupleToDimensions >> Item)
 
 
@@ -192,7 +136,7 @@ view model =
             [ h1 [] [ text "Elm Dynamic List" ] ]
         , main_ []
             [ controlPanel model
-            , div [] (List.map (itemView model.layout) model.items)
+            , div [] (List.map (itemView model.config) model.items)
             ]
         , footer []
             [ code
@@ -235,9 +179,9 @@ controlPanel model =
                 , input
                     [ Attr.style [ ( "width", "50px" ) ]
                     , Attr.type_ "number"
-                    , Events.onInput UpdateColumnWidth
+                    , Events.onInput Config.UpdateWidth |> Attr.map UpdateConfig
                     , Attr.placeholder "240"
-                    , model.layout.columnWidth
+                    , model.config.width
                         |> viewMaybeInt
                         |> Attr.value
                     ]
@@ -248,9 +192,9 @@ controlPanel model =
                 , input
                     [ Attr.style [ ( "width", "50px" ) ]
                     , Attr.type_ "number"
-                    , Events.onInput UpdateXMargin
+                    , Events.onInput Config.UpdateXMargin |> Attr.map UpdateConfig
                     , Attr.placeholder "12"
-                    , model.layout.xMargin
+                    , model.config.xMargin
                         |> viewMaybeInt
                         |> Attr.value
                     ]
@@ -261,9 +205,9 @@ controlPanel model =
                 , input
                     [ Attr.style [ ( "width", "50px" ) ]
                     , Attr.type_ "number"
-                    , Events.onInput UpdateYMargin
+                    , Events.onInput Config.UpdateYMargin |> Attr.map UpdateConfig
                     , Attr.placeholder "12"
-                    , model.layout.yMargin
+                    , model.config.yMargin
                         |> viewMaybeInt
                         |> Attr.value
                     ]
@@ -273,14 +217,18 @@ controlPanel model =
         ]
 
 
-itemView : Layout -> Item -> Html Msg
-itemView layout { dimensions } =
+itemView : Config -> Item -> Html Msg
+itemView config { dimensions } =
     div
         [ Attr.style
             [ ( "border", "1px solid black" )
             , ( "display", "inline-block" )
-            , ( "margin", maybeIntToPx layout.yMargin 12 ++ " " ++ maybeIntToPx layout.xMargin 12 )
-            , ( "width", maybeIntToPx layout.columnWidth 240 )
+            , ( "margin"
+              , maybeIntToPx config.yMargin Config.defaultYMargin
+                    ++ " "
+                    ++ maybeIntToPx config.xMargin Config.defaultXMargin
+              )
+            , ( "width", maybeIntToPx config.width Config.defaultWidth )
             , ( "height", toString dimensions.height ++ "px" )
             ]
         ]
