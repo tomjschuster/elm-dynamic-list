@@ -28,7 +28,7 @@ infixr 9 =>
 
 
 type alias Model =
-    { generatorCount : Maybe Int
+    { randomItemCount : Maybe Int
     , config : Config
     , items : List Item
     }
@@ -57,7 +57,7 @@ type alias Dimensions =
 
 type Msg
     = NoOp
-    | UpdateGeneratorCount String
+    | UpdateRandomItemCount String
     | GenerateRandomItem
     | SetItems (List Item)
     | ClearItems
@@ -70,15 +70,15 @@ update msg model =
         NoOp ->
             model => Cmd.none
 
-        UpdateGeneratorCount intString ->
+        UpdateRandomItemCount intString ->
             let
-                generatorCount =
+                randomItemCount =
                     if intString == "" then
                         Nothing
                     else
                         Result.withDefault 12 (String.toInt intString) |> Just
             in
-            { model | generatorCount = generatorCount } => Cmd.none
+            { model | randomItemCount = randomItemCount } => Cmd.none
 
         UpdateConfig configMsg ->
             { model | config = Config.update configMsg model.config } => Cmd.none
@@ -86,7 +86,7 @@ update msg model =
         GenerateRandomItem ->
             model
                 => (Random.list
-                        (Maybe.withDefault 12 model.generatorCount)
+                        (Maybe.withDefault 12 model.randomItemCount)
                         (itemGenerator model.config)
                         |> Random.generate SetItems
                    )
@@ -132,84 +132,64 @@ view : Model -> Html Msg
 view model =
     div
         []
-        [ header []
-            [ h1 [] [ text "Elm Dynamic List" ] ]
+        [ header [] [ h1 [] [ text "Elm Dynamic List" ] ]
         , main_ []
             [ controlPanel model
             , div [] (List.map (itemView model.config) model.items)
             ]
-        , footer []
-            [ code
-                [ Attr.style [ ( "width", "500px" ), ( "display", "block" ) ] ]
-                [ text <| toString model ]
-            ]
+        , footer [] [ code [] [ text <| toString model ] ]
         ]
 
 
 controlPanel : Model -> Html Msg
 controlPanel model =
-    div []
-        [ fieldset [ Attr.style [ ( "display", "inline-block" ) ] ]
+    div [ Attr.class "control-panel" ]
+        [ fieldset []
             [ div []
-                [ label [ Attr.style [ ( "display", "block" ) ] ] [ text "Item Generator" ]
+                [ label [] [ text "Item Generator" ]
                 , input
-                    [ model.generatorCount
-                        |> viewMaybeInt
-                        |> Attr.value
-                    , Events.onInput UpdateGeneratorCount
+                    [ model.randomItemCount |> viewMaybeInt |> Attr.value
+                    , Events.onInput UpdateRandomItemCount
                     , Attr.type_ "number"
-                    , Attr.style [ ( "width", "50px" ) ]
                     , Attr.placeholder "12"
                     ]
                     []
                 , button
-                    [ Events.onClick GenerateRandomItem
-                    ]
+                    [ Events.onClick GenerateRandomItem ]
                     [ text "Generate" ]
                 , button
-                    [ Events.onClick ClearItems
-                    , Attr.disabled (List.isEmpty model.items)
-                    ]
+                    [ Events.onClick ClearItems ]
                     [ text "Clear" ]
                 ]
             ]
-        , fieldset [ Attr.style [ ( "display", "inline-block" ) ] ]
-            [ div [ Attr.style [ ( "display", "inline-block" ) ] ]
-                [ label [ Attr.style [ ( "display", "block" ) ] ] [ text "Column Width" ]
+        , fieldset []
+            [ div []
+                [ label [] [ text "Column Width" ]
                 , input
-                    [ Attr.style [ ( "width", "50px" ) ]
-                    , Attr.type_ "number"
+                    [ Attr.type_ "number"
                     , Events.onInput Config.UpdateWidth |> Attr.map UpdateConfig
                     , Attr.placeholder "240"
-                    , model.config.width
-                        |> viewMaybeInt
-                        |> Attr.value
+                    , model.config.width |> viewMaybeInt |> Attr.value
                     ]
                     []
                 ]
-            , div [ Attr.style [ ( "display", "inline-block" ) ] ]
-                [ label [ Attr.style [ ( "display", "block" ) ] ] [ text "X Margin" ]
+            , div []
+                [ label [] [ text "X Margin" ]
                 , input
-                    [ Attr.style [ ( "width", "50px" ) ]
-                    , Attr.type_ "number"
+                    [ Attr.type_ "number"
                     , Events.onInput Config.UpdateXMargin |> Attr.map UpdateConfig
                     , Attr.placeholder "12"
-                    , model.config.xMargin
-                        |> viewMaybeInt
-                        |> Attr.value
+                    , model.config.xMargin |> viewMaybeInt |> Attr.value
                     ]
                     []
                 ]
-            , div [ Attr.style [ ( "display", "inline-block" ) ] ]
-                [ label [ Attr.style [ ( "display", "block" ) ] ] [ text "Y Margin" ]
+            , div []
+                [ label [] [ text "Y Margin" ]
                 , input
-                    [ Attr.style [ ( "width", "50px" ) ]
-                    , Attr.type_ "number"
+                    [ Attr.type_ "number"
                     , Events.onInput Config.UpdateYMargin |> Attr.map UpdateConfig
                     , Attr.placeholder "12"
-                    , model.config.yMargin
-                        |> viewMaybeInt
-                        |> Attr.value
+                    , model.config.yMargin |> viewMaybeInt |> Attr.value
                     ]
                     []
                 ]
@@ -220,10 +200,9 @@ controlPanel model =
 itemView : Config -> Item -> Html Msg
 itemView config { dimensions } =
     div
-        [ Attr.style
-            [ ( "border", "1px solid black" )
-            , ( "display", "inline-block" )
-            , ( "margin"
+        [ Attr.class "item"
+        , Attr.style
+            [ ( "margin"
               , maybeIntToPx config.yMargin Config.defaultYMargin
                     ++ " "
                     ++ maybeIntToPx config.xMargin Config.defaultXMargin
@@ -233,13 +212,6 @@ itemView config { dimensions } =
             ]
         ]
         []
-
-
-dimensionsStyle : Dimensions -> List ( String, String )
-dimensionsStyle { height, width } =
-    [ ( "height", toString height ++ "px" )
-    , ( "width", toString width ++ "px" )
-    ]
 
 
 viewMaybeInt : Maybe Int -> String

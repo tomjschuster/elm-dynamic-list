@@ -1,0 +1,25 @@
+footer code {
+  max-width: 512px;
+  display: block;
+}
+
+.control-panel fieldset {
+  display: inline-block;
+}
+
+.control-panel fieldset > div {
+  display: inline-block;
+}
+
+.control-panel label {
+  display: block;
+}
+
+.control-panel input {
+  width: 50px;
+}
+
+.item {
+  display: inline-block;
+  border: 1px black solid;
+}
