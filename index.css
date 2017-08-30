@@ -23,3 +23,7 @@ footer code {
   display: inline-block;
   border: 1px black solid;
 }
+
+.item.dragged {
+  border: 1px black dashed;
+}

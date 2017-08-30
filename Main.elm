@@ -4,6 +4,7 @@ import Config exposing (Config)
 import Html exposing (Html, button, code, div, fieldset, footer, h1, h2, header, input, label, main_, p, text)
 import Html.Attributes as Attr
 import Html.Events as Events
+import Mouse
 import Random
 
 
@@ -31,17 +32,19 @@ type alias Model =
     { randomItemCount : Maybe Int
     , config : Config
     , items : List Item
+    , draggedItemId : Maybe Int
     }
 
 
 init : ( Model, Cmd Msg )
 init =
-    Model (Just 12) Config.default []
+    Model (Just 12) Config.default [] Nothing
         => (Random.list 12 (itemGenerator Config.default) |> Random.generate SetItems)
 
 
 type alias Item =
     { dimensions : Dimensions
+    , id : Int
     }
 
 
@@ -59,9 +62,11 @@ type Msg
     = NoOp
     | UpdateRandomItemCount String
     | GenerateRandomItem
-    | SetItems (List Item)
+    | SetItems (List (Int -> Item))
     | ClearItems
     | UpdateConfig Config.Msg
+    | SetDraggedItem Int
+    | ClearDraggedItem Mouse.Position
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -91,11 +96,21 @@ update msg model =
                         |> Random.generate SetItems
                    )
 
-        SetItems items ->
+        SetItems toItems ->
+            let
+                ( _, items ) =
+                    List.foldl (\toItem ( id, items ) -> ( id - 1, toItem id :: items )) ( List.length toItems, [] ) toItems
+            in
             { model | items = items } => Cmd.none
 
         ClearItems ->
             { model | items = [] } => Cmd.none
+
+        SetDraggedItem id ->
+            { model | draggedItemId = Just id } => Cmd.none
+
+        ClearDraggedItem _ ->
+            { model | draggedItemId = Nothing } => Cmd.none
 
 
 tupleToDimensions : ( Float, Float ) -> Dimensions
@@ -103,7 +118,7 @@ tupleToDimensions ( height, width ) =
     Dimensions height width
 
 
-itemGenerator : Config -> Random.Generator Item
+itemGenerator : Config -> Random.Generator (Int -> Item)
 itemGenerator config =
     let
         width =
@@ -121,7 +136,9 @@ itemGenerator config =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.none
+    Sub.batch
+        [ Mouse.ups ClearDraggedItem
+        ]
 
 
 
@@ -135,7 +152,7 @@ view model =
         [ header [] [ h1 [] [ text "Elm Dynamic List" ] ]
         , main_ []
             [ controlPanel model
-            , div [] (List.map (itemView model.config) model.items)
+            , div [] (List.map (itemView model.config model.draggedItemId) model.items)
             ]
         , footer [] [ code [] [ text <| toString model ] ]
         ]
@@ -197,21 +214,37 @@ controlPanel model =
         ]
 
 
-itemView : Config -> Item -> Html Msg
-itemView config { dimensions } =
+compareIds : Maybe Int -> Int -> Bool
+compareIds maybeId currentId =
+    case maybeId of
+        Just id ->
+            id == currentId
+
+        Nothing ->
+            False
+
+
+itemView : Config -> Maybe Int -> Item -> Html Msg
+itemView config draggedItemId { dimensions, id } =
     div
-        [ Attr.class "item"
-        , Attr.style
-            [ ( "margin"
-              , maybeIntToPx config.yMargin Config.defaultYMargin
-                    ++ " "
-                    ++ maybeIntToPx config.xMargin Config.defaultXMargin
-              )
-            , ( "width", maybeIntToPx config.width Config.defaultWidth )
-            , ( "height", toString dimensions.height ++ "px" )
-            ]
+        [ Attr.classList [ ( "item", True ), ( "dragged", compareIds draggedItemId id ) ]
+        , itemStyle config dimensions
+        , Events.onMouseDown (SetDraggedItem id)
         ]
         []
+
+
+itemStyle : Config -> Dimensions -> Html.Attribute Msg
+itemStyle { width, xMargin, yMargin } { height } =
+    Attr.style
+        [ ( "margin"
+          , maybeIntToPx yMargin Config.defaultYMargin
+                ++ " "
+                ++ maybeIntToPx xMargin Config.defaultXMargin
+          )
+        , ( "width", maybeIntToPx width Config.defaultWidth )
+        , ( "height", toString height ++ "px" )
+        ]
 
 
 viewMaybeInt : Maybe Int -> String

@@ -6142,6 +6142,10 @@ var _elm_lang$core$Json_Decode$bool = _elm_lang$core$Native_Json.decodePrimitive
 var _elm_lang$core$Json_Decode$string = _elm_lang$core$Native_Json.decodePrimitive('string');
 var _elm_lang$core$Json_Decode$Decoder = {ctor: 'Decoder'};
 
+var _elm_lang$core$Process$kill = _elm_lang$core$Native_Scheduler.kill;
+var _elm_lang$core$Process$sleep = _elm_lang$core$Native_Scheduler.sleep;
+var _elm_lang$core$Process$spawn = _elm_lang$core$Native_Scheduler.spawn;
+
 var _elm_lang$core$Tuple$mapSecond = F2(
 	function (func, _p0) {
 		var _p1 = _p0;
@@ -6547,6 +6551,192 @@ var _elm_lang$core$Random$cmdMap = F2(
 			A2(_elm_lang$core$Random$map, func, _p79._0));
 	});
 _elm_lang$core$Native_Platform.effectManagers['Random'] = {pkg: 'elm-lang/core', init: _elm_lang$core$Random$init, onEffects: _elm_lang$core$Random$onEffects, onSelfMsg: _elm_lang$core$Random$onSelfMsg, tag: 'cmd', cmdMap: _elm_lang$core$Random$cmdMap};
+
+var _elm_lang$dom$Native_Dom = function() {
+
+var fakeNode = {
+	addEventListener: function() {},
+	removeEventListener: function() {}
+};
+
+var onDocument = on(typeof document !== 'undefined' ? document : fakeNode);
+var onWindow = on(typeof window !== 'undefined' ? window : fakeNode);
+
+function on(node)
+{
+	return function(eventName, decoder, toTask)
+	{
+		return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
+
+			function performTask(event)
+			{
+				var result = A2(_elm_lang$core$Json_Decode$decodeValue, decoder, event);
+				if (result.ctor === 'Ok')
+				{
+					_elm_lang$core$Native_Scheduler.rawSpawn(toTask(result._0));
+				}
+			}
+
+			node.addEventListener(eventName, performTask);
+
+			return function()
+			{
+				node.removeEventListener(eventName, performTask);
+			};
+		});
+	};
+}
+
+var rAF = typeof requestAnimationFrame !== 'undefined'
+	? requestAnimationFrame
+	: function(callback) { callback(); };
+
+function withNode(id, doStuff)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		rAF(function()
+		{
+			var node = document.getElementById(id);
+			if (node === null)
+			{
+				callback(_elm_lang$core$Native_Scheduler.fail({ ctor: 'NotFound', _0: id }));
+				return;
+			}
+			callback(_elm_lang$core$Native_Scheduler.succeed(doStuff(node)));
+		});
+	});
+}
+
+
+// FOCUS
+
+function focus(id)
+{
+	return withNode(id, function(node) {
+		node.focus();
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+function blur(id)
+{
+	return withNode(id, function(node) {
+		node.blur();
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+
+// SCROLLING
+
+function getScrollTop(id)
+{
+	return withNode(id, function(node) {
+		return node.scrollTop;
+	});
+}
+
+function setScrollTop(id, desiredScrollTop)
+{
+	return withNode(id, function(node) {
+		node.scrollTop = desiredScrollTop;
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+function toBottom(id)
+{
+	return withNode(id, function(node) {
+		node.scrollTop = node.scrollHeight;
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+function getScrollLeft(id)
+{
+	return withNode(id, function(node) {
+		return node.scrollLeft;
+	});
+}
+
+function setScrollLeft(id, desiredScrollLeft)
+{
+	return withNode(id, function(node) {
+		node.scrollLeft = desiredScrollLeft;
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+function toRight(id)
+{
+	return withNode(id, function(node) {
+		node.scrollLeft = node.scrollWidth;
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+
+// SIZE
+
+function width(options, id)
+{
+	return withNode(id, function(node) {
+		switch (options.ctor)
+		{
+			case 'Content':
+				return node.scrollWidth;
+			case 'VisibleContent':
+				return node.clientWidth;
+			case 'VisibleContentWithBorders':
+				return node.offsetWidth;
+			case 'VisibleContentWithBordersAndMargins':
+				var rect = node.getBoundingClientRect();
+				return rect.right - rect.left;
+		}
+	});
+}
+
+function height(options, id)
+{
+	return withNode(id, function(node) {
+		switch (options.ctor)
+		{
+			case 'Content':
+				return node.scrollHeight;
+			case 'VisibleContent':
+				return node.clientHeight;
+			case 'VisibleContentWithBorders':
+				return node.offsetHeight;
+			case 'VisibleContentWithBordersAndMargins':
+				var rect = node.getBoundingClientRect();
+				return rect.bottom - rect.top;
+		}
+	});
+}
+
+return {
+	onDocument: F3(onDocument),
+	onWindow: F3(onWindow),
+
+	focus: focus,
+	blur: blur,
+
+	getScrollTop: getScrollTop,
+	setScrollTop: F2(setScrollTop),
+	getScrollLeft: getScrollLeft,
+	setScrollLeft: F2(setScrollLeft),
+	toBottom: toBottom,
+	toRight: toRight,
+
+	height: F2(height),
+	width: F2(width)
+};
+
+}();
+
+var _elm_lang$dom$Dom_LowLevel$onWindow = _elm_lang$dom$Native_Dom.onWindow;
+var _elm_lang$dom$Dom_LowLevel$onDocument = _elm_lang$dom$Native_Dom.onDocument;
 
 var _elm_lang$virtual_dom$VirtualDom_Debug$wrap;
 var _elm_lang$virtual_dom$VirtualDom_Debug$wrapWithFlags;
@@ -9051,6 +9241,189 @@ var _elm_lang$html$Html_Events$Options = F2(
 		return {stopPropagation: a, preventDefault: b};
 	});
 
+var _elm_lang$mouse$Mouse_ops = _elm_lang$mouse$Mouse_ops || {};
+_elm_lang$mouse$Mouse_ops['&>'] = F2(
+	function (t1, t2) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (_p0) {
+				return t2;
+			},
+			t1);
+	});
+var _elm_lang$mouse$Mouse$onSelfMsg = F3(
+	function (router, _p1, state) {
+		var _p2 = _p1;
+		var _p3 = A2(_elm_lang$core$Dict$get, _p2.category, state);
+		if (_p3.ctor === 'Nothing') {
+			return _elm_lang$core$Task$succeed(state);
+		} else {
+			var send = function (tagger) {
+				return A2(
+					_elm_lang$core$Platform$sendToApp,
+					router,
+					tagger(_p2.position));
+			};
+			return A2(
+				_elm_lang$mouse$Mouse_ops['&>'],
+				_elm_lang$core$Task$sequence(
+					A2(_elm_lang$core$List$map, send, _p3._0.taggers)),
+				_elm_lang$core$Task$succeed(state));
+		}
+	});
+var _elm_lang$mouse$Mouse$init = _elm_lang$core$Task$succeed(_elm_lang$core$Dict$empty);
+var _elm_lang$mouse$Mouse$categorizeHelpHelp = F2(
+	function (value, maybeValues) {
+		var _p4 = maybeValues;
+		if (_p4.ctor === 'Nothing') {
+			return _elm_lang$core$Maybe$Just(
+				{
+					ctor: '::',
+					_0: value,
+					_1: {ctor: '[]'}
+				});
+		} else {
+			return _elm_lang$core$Maybe$Just(
+				{ctor: '::', _0: value, _1: _p4._0});
+		}
+	});
+var _elm_lang$mouse$Mouse$categorizeHelp = F2(
+	function (subs, subDict) {
+		categorizeHelp:
+		while (true) {
+			var _p5 = subs;
+			if (_p5.ctor === '[]') {
+				return subDict;
+			} else {
+				var _v4 = _p5._1,
+					_v5 = A3(
+					_elm_lang$core$Dict$update,
+					_p5._0._0,
+					_elm_lang$mouse$Mouse$categorizeHelpHelp(_p5._0._1),
+					subDict);
+				subs = _v4;
+				subDict = _v5;
+				continue categorizeHelp;
+			}
+		}
+	});
+var _elm_lang$mouse$Mouse$categorize = function (subs) {
+	return A2(_elm_lang$mouse$Mouse$categorizeHelp, subs, _elm_lang$core$Dict$empty);
+};
+var _elm_lang$mouse$Mouse$subscription = _elm_lang$core$Native_Platform.leaf('Mouse');
+var _elm_lang$mouse$Mouse$Position = F2(
+	function (a, b) {
+		return {x: a, y: b};
+	});
+var _elm_lang$mouse$Mouse$position = A3(
+	_elm_lang$core$Json_Decode$map2,
+	_elm_lang$mouse$Mouse$Position,
+	A2(_elm_lang$core$Json_Decode$field, 'pageX', _elm_lang$core$Json_Decode$int),
+	A2(_elm_lang$core$Json_Decode$field, 'pageY', _elm_lang$core$Json_Decode$int));
+var _elm_lang$mouse$Mouse$Watcher = F2(
+	function (a, b) {
+		return {taggers: a, pid: b};
+	});
+var _elm_lang$mouse$Mouse$Msg = F2(
+	function (a, b) {
+		return {category: a, position: b};
+	});
+var _elm_lang$mouse$Mouse$onEffects = F3(
+	function (router, newSubs, oldState) {
+		var rightStep = F3(
+			function (category, taggers, task) {
+				var tracker = A3(
+					_elm_lang$dom$Dom_LowLevel$onDocument,
+					category,
+					_elm_lang$mouse$Mouse$position,
+					function (_p6) {
+						return A2(
+							_elm_lang$core$Platform$sendToSelf,
+							router,
+							A2(_elm_lang$mouse$Mouse$Msg, category, _p6));
+					});
+				return A2(
+					_elm_lang$core$Task$andThen,
+					function (state) {
+						return A2(
+							_elm_lang$core$Task$andThen,
+							function (pid) {
+								return _elm_lang$core$Task$succeed(
+									A3(
+										_elm_lang$core$Dict$insert,
+										category,
+										A2(_elm_lang$mouse$Mouse$Watcher, taggers, pid),
+										state));
+							},
+							_elm_lang$core$Process$spawn(tracker));
+					},
+					task);
+			});
+		var bothStep = F4(
+			function (category, _p7, taggers, task) {
+				var _p8 = _p7;
+				return A2(
+					_elm_lang$core$Task$andThen,
+					function (state) {
+						return _elm_lang$core$Task$succeed(
+							A3(
+								_elm_lang$core$Dict$insert,
+								category,
+								A2(_elm_lang$mouse$Mouse$Watcher, taggers, _p8.pid),
+								state));
+					},
+					task);
+			});
+		var leftStep = F3(
+			function (category, _p9, task) {
+				var _p10 = _p9;
+				return A2(
+					_elm_lang$mouse$Mouse_ops['&>'],
+					_elm_lang$core$Process$kill(_p10.pid),
+					task);
+			});
+		return A6(
+			_elm_lang$core$Dict$merge,
+			leftStep,
+			bothStep,
+			rightStep,
+			oldState,
+			_elm_lang$mouse$Mouse$categorize(newSubs),
+			_elm_lang$core$Task$succeed(_elm_lang$core$Dict$empty));
+	});
+var _elm_lang$mouse$Mouse$MySub = F2(
+	function (a, b) {
+		return {ctor: 'MySub', _0: a, _1: b};
+	});
+var _elm_lang$mouse$Mouse$clicks = function (tagger) {
+	return _elm_lang$mouse$Mouse$subscription(
+		A2(_elm_lang$mouse$Mouse$MySub, 'click', tagger));
+};
+var _elm_lang$mouse$Mouse$moves = function (tagger) {
+	return _elm_lang$mouse$Mouse$subscription(
+		A2(_elm_lang$mouse$Mouse$MySub, 'mousemove', tagger));
+};
+var _elm_lang$mouse$Mouse$downs = function (tagger) {
+	return _elm_lang$mouse$Mouse$subscription(
+		A2(_elm_lang$mouse$Mouse$MySub, 'mousedown', tagger));
+};
+var _elm_lang$mouse$Mouse$ups = function (tagger) {
+	return _elm_lang$mouse$Mouse$subscription(
+		A2(_elm_lang$mouse$Mouse$MySub, 'mouseup', tagger));
+};
+var _elm_lang$mouse$Mouse$subMap = F2(
+	function (func, _p11) {
+		var _p12 = _p11;
+		return A2(
+			_elm_lang$mouse$Mouse$MySub,
+			_p12._0,
+			function (_p13) {
+				return func(
+					_p12._1(_p13));
+			});
+	});
+_elm_lang$core$Native_Platform.effectManagers['Mouse'] = {pkg: 'elm-lang/mouse', init: _elm_lang$mouse$Mouse$init, onEffects: _elm_lang$mouse$Mouse$onEffects, onSelfMsg: _elm_lang$mouse$Mouse$onSelfMsg, tag: 'sub', subMap: _elm_lang$mouse$Mouse$subMap};
+
 var _tomjschuster$elm_dynamic_list$Config$stringToMaybeInt = F2(
 	function ($default, stringInt) {
 		return _elm_lang$core$Native_Utils.eq(stringInt, '') ? _elm_lang$core$Maybe$Nothing : A2(
@@ -9128,92 +9501,151 @@ var _tomjschuster$elm_dynamic_list$Main$viewMaybeInt = function (maybeInt) {
 		'',
 		A2(_elm_lang$core$Maybe$map, _elm_lang$core$Basics$toString, maybeInt));
 };
-var _tomjschuster$elm_dynamic_list$Main$itemView = F2(
-	function (config, _p0) {
-		var _p1 = _p0;
-		return A2(
-			_elm_lang$html$Html$div,
+var _tomjschuster$elm_dynamic_list$Main$itemStyle = F2(
+	function (_p1, _p0) {
+		var _p2 = _p1;
+		var _p3 = _p0;
+		return _elm_lang$html$Html_Attributes$style(
 			{
 				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$class('item'),
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'margin',
+					_1: A2(
+						_elm_lang$core$Basics_ops['++'],
+						A2(_tomjschuster$elm_dynamic_list$Main$maybeIntToPx, _p2.yMargin, _tomjschuster$elm_dynamic_list$Config$defaultYMargin),
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							' ',
+							A2(_tomjschuster$elm_dynamic_list$Main$maybeIntToPx, _p2.xMargin, _tomjschuster$elm_dynamic_list$Config$defaultXMargin)))
+				},
 				_1: {
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$style(
-						{
-							ctor: '::',
-							_0: {
-								ctor: '_Tuple2',
-								_0: 'margin',
-								_1: A2(
-									_elm_lang$core$Basics_ops['++'],
-									A2(_tomjschuster$elm_dynamic_list$Main$maybeIntToPx, config.yMargin, _tomjschuster$elm_dynamic_list$Config$defaultYMargin),
-									A2(
-										_elm_lang$core$Basics_ops['++'],
-										' ',
-										A2(_tomjschuster$elm_dynamic_list$Main$maybeIntToPx, config.xMargin, _tomjschuster$elm_dynamic_list$Config$defaultXMargin)))
-							},
-							_1: {
-								ctor: '::',
-								_0: {
-									ctor: '_Tuple2',
-									_0: 'width',
-									_1: A2(_tomjschuster$elm_dynamic_list$Main$maybeIntToPx, config.width, _tomjschuster$elm_dynamic_list$Config$defaultWidth)
-								},
-								_1: {
-									ctor: '::',
-									_0: {
-										ctor: '_Tuple2',
-										_0: 'height',
-										_1: A2(
-											_elm_lang$core$Basics_ops['++'],
-											_elm_lang$core$Basics$toString(_p1.dimensions.height),
-											'px')
-									},
-									_1: {ctor: '[]'}
-								}
-							}
-						}),
-					_1: {ctor: '[]'}
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'width',
+						_1: A2(_tomjschuster$elm_dynamic_list$Main$maybeIntToPx, _p2.width, _tomjschuster$elm_dynamic_list$Config$defaultWidth)
+					},
+					_1: {
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'height',
+							_1: A2(
+								_elm_lang$core$Basics_ops['++'],
+								_elm_lang$core$Basics$toString(_p3.height),
+								'px')
+						},
+						_1: {ctor: '[]'}
+					}
 				}
-			},
-			{ctor: '[]'});
+			});
 	});
-var _tomjschuster$elm_dynamic_list$Main$subscriptions = function (model) {
-	return _elm_lang$core$Platform_Sub$none;
-};
+var _tomjschuster$elm_dynamic_list$Main$compareIds = F2(
+	function (maybeId, currentId) {
+		var _p4 = maybeId;
+		if (_p4.ctor === 'Just') {
+			return _elm_lang$core$Native_Utils.eq(_p4._0, currentId);
+		} else {
+			return false;
+		}
+	});
 var _tomjschuster$elm_dynamic_list$Main_ops = _tomjschuster$elm_dynamic_list$Main_ops || {};
 _tomjschuster$elm_dynamic_list$Main_ops['=>'] = F2(
 	function (v0, v1) {
 		return {ctor: '_Tuple2', _0: v0, _1: v1};
 	});
-var _tomjschuster$elm_dynamic_list$Main$Model = F3(
-	function (a, b, c) {
-		return {randomItemCount: a, config: b, items: c};
+var _tomjschuster$elm_dynamic_list$Main$Model = F4(
+	function (a, b, c, d) {
+		return {randomItemCount: a, config: b, items: c, draggedItemId: d};
 	});
-var _tomjschuster$elm_dynamic_list$Main$Item = function (a) {
-	return {dimensions: a};
-};
+var _tomjschuster$elm_dynamic_list$Main$Item = F2(
+	function (a, b) {
+		return {dimensions: a, id: b};
+	});
 var _tomjschuster$elm_dynamic_list$Main$Dimensions = F2(
 	function (a, b) {
 		return {height: a, width: b};
 	});
-var _tomjschuster$elm_dynamic_list$Main$tupleToDimensions = function (_p2) {
-	var _p3 = _p2;
-	return A2(_tomjschuster$elm_dynamic_list$Main$Dimensions, _p3._0, _p3._1);
+var _tomjschuster$elm_dynamic_list$Main$tupleToDimensions = function (_p5) {
+	var _p6 = _p5;
+	return A2(_tomjschuster$elm_dynamic_list$Main$Dimensions, _p6._0, _p6._1);
 };
 var _tomjschuster$elm_dynamic_list$Main$itemGenerator = function (config) {
 	var width = _elm_lang$core$Basics$toFloat(_tomjschuster$elm_dynamic_list$Config$defaultWidth);
 	return A2(
 		_elm_lang$core$Random$map,
-		function (_p4) {
+		function (_p7) {
 			return _tomjschuster$elm_dynamic_list$Main$Item(
-				_tomjschuster$elm_dynamic_list$Main$tupleToDimensions(_p4));
+				_tomjschuster$elm_dynamic_list$Main$tupleToDimensions(_p7));
 		},
 		A2(
 			_elm_lang$core$Random$pair,
 			A2(_elm_lang$core$Random$float, 50, 500),
 			A2(_elm_lang$core$Random$float, width, width)));
 };
+var _tomjschuster$elm_dynamic_list$Main$ClearDraggedItem = function (a) {
+	return {ctor: 'ClearDraggedItem', _0: a};
+};
+var _tomjschuster$elm_dynamic_list$Main$subscriptions = function (model) {
+	return _elm_lang$core$Platform_Sub$batch(
+		{
+			ctor: '::',
+			_0: _elm_lang$mouse$Mouse$ups(_tomjschuster$elm_dynamic_list$Main$ClearDraggedItem),
+			_1: {ctor: '[]'}
+		});
+};
+var _tomjschuster$elm_dynamic_list$Main$SetDraggedItem = function (a) {
+	return {ctor: 'SetDraggedItem', _0: a};
+};
+var _tomjschuster$elm_dynamic_list$Main$itemView = F3(
+	function (config, draggedItemId, _p8) {
+		var _p9 = _p8;
+		var _p10 = _p9.id;
+		var a = A2(
+			_elm_lang$core$Debug$log,
+			'id',
+			{
+				ctor: '_Tuple2',
+				_0: _p10,
+				_1: A2(_tomjschuster$elm_dynamic_list$Main$compareIds, draggedItemId, _p10)
+			});
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$classList(
+					{
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'item', _1: true},
+						_1: {
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: 'dragged',
+								_1: A2(_tomjschuster$elm_dynamic_list$Main$compareIds, draggedItemId, _p10)
+							},
+							_1: {ctor: '[]'}
+						}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(_tomjschuster$elm_dynamic_list$Main$itemStyle, config, _p9.dimensions),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Events$onMouseDown(
+							_tomjschuster$elm_dynamic_list$Main$SetDraggedItem(_p10)),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$hidden(
+								A2(_tomjschuster$elm_dynamic_list$Main$compareIds, draggedItemId, _p10)),
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			},
+			{ctor: '[]'});
+	});
 var _tomjschuster$elm_dynamic_list$Main$UpdateConfig = function (a) {
 	return {ctor: 'UpdateConfig', _0: a};
 };
@@ -9223,11 +9655,12 @@ var _tomjschuster$elm_dynamic_list$Main$SetItems = function (a) {
 };
 var _tomjschuster$elm_dynamic_list$Main$init = A2(
 	_tomjschuster$elm_dynamic_list$Main_ops['=>'],
-	A3(
+	A4(
 		_tomjschuster$elm_dynamic_list$Main$Model,
 		_elm_lang$core$Maybe$Just(12),
 		_tomjschuster$elm_dynamic_list$Config$default,
-		{ctor: '[]'}),
+		{ctor: '[]'},
+		_elm_lang$core$Maybe$Nothing),
 	A2(
 		_elm_lang$core$Random$generate,
 		_tomjschuster$elm_dynamic_list$Main$SetItems,
@@ -9237,17 +9670,17 @@ var _tomjschuster$elm_dynamic_list$Main$init = A2(
 			_tomjschuster$elm_dynamic_list$Main$itemGenerator(_tomjschuster$elm_dynamic_list$Config$default))));
 var _tomjschuster$elm_dynamic_list$Main$update = F2(
 	function (msg, model) {
-		var _p5 = msg;
-		switch (_p5.ctor) {
+		var _p11 = msg;
+		switch (_p11.ctor) {
 			case 'NoOp':
 				return A2(_tomjschuster$elm_dynamic_list$Main_ops['=>'], model, _elm_lang$core$Platform_Cmd$none);
 			case 'UpdateRandomItemCount':
-				var _p6 = _p5._0;
-				var randomItemCount = _elm_lang$core$Native_Utils.eq(_p6, '') ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(
+				var _p12 = _p11._0;
+				var randomItemCount = _elm_lang$core$Native_Utils.eq(_p12, '') ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(
 					A2(
 						_elm_lang$core$Result$withDefault,
 						12,
-						_elm_lang$core$String$toInt(_p6)));
+						_elm_lang$core$String$toInt(_p12)));
 				return A2(
 					_tomjschuster$elm_dynamic_list$Main_ops['=>'],
 					_elm_lang$core$Native_Utils.update(
@@ -9260,7 +9693,7 @@ var _tomjschuster$elm_dynamic_list$Main$update = F2(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
-							config: A2(_tomjschuster$elm_dynamic_list$Config$update, _p5._0, model.config)
+							config: A2(_tomjschuster$elm_dynamic_list$Config$update, _p11._0, model.config)
 						}),
 					_elm_lang$core$Platform_Cmd$none);
 			case 'GenerateRandomItem':
@@ -9275,13 +9708,37 @@ var _tomjschuster$elm_dynamic_list$Main$update = F2(
 							A2(_elm_lang$core$Maybe$withDefault, 12, model.randomItemCount),
 							_tomjschuster$elm_dynamic_list$Main$itemGenerator(model.config))));
 			case 'SetItems':
+				var _p17 = _p11._0;
+				var _p13 = A3(
+					_elm_lang$core$List$foldl,
+					F2(
+						function (toItem, _p14) {
+							var _p15 = _p14;
+							var _p16 = _p15._0;
+							return {
+								ctor: '_Tuple2',
+								_0: _p16 - 1,
+								_1: {
+									ctor: '::',
+									_0: toItem(_p16),
+									_1: _p15._1
+								}
+							};
+						}),
+					{
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$List$length(_p17),
+						_1: {ctor: '[]'}
+					},
+					_p17);
+				var items = _p13._1;
 				return A2(
 					_tomjschuster$elm_dynamic_list$Main_ops['=>'],
 					_elm_lang$core$Native_Utils.update(
 						model,
-						{items: _p5._0}),
+						{items: items}),
 					_elm_lang$core$Platform_Cmd$none);
-			default:
+			case 'ClearItems':
 				return A2(
 					_tomjschuster$elm_dynamic_list$Main_ops['=>'],
 					_elm_lang$core$Native_Utils.update(
@@ -9289,6 +9746,22 @@ var _tomjschuster$elm_dynamic_list$Main$update = F2(
 						{
 							items: {ctor: '[]'}
 						}),
+					_elm_lang$core$Platform_Cmd$none);
+			case 'SetDraggedItem':
+				return A2(
+					_tomjschuster$elm_dynamic_list$Main_ops['=>'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{
+							draggedItemId: _elm_lang$core$Maybe$Just(_p11._0)
+						}),
+					_elm_lang$core$Platform_Cmd$none);
+			default:
+				return A2(
+					_tomjschuster$elm_dynamic_list$Main_ops['=>'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{draggedItemId: _elm_lang$core$Maybe$Nothing}),
 					_elm_lang$core$Platform_Cmd$none);
 		}
 	});
@@ -9563,7 +10036,7 @@ var _tomjschuster$elm_dynamic_list$Main$view = function (model) {
 								{ctor: '[]'},
 								A2(
 									_elm_lang$core$List$map,
-									_tomjschuster$elm_dynamic_list$Main$itemView(model.config),
+									A2(_tomjschuster$elm_dynamic_list$Main$itemView, model.config, model.draggedItemId),
 									model.items)),
 							_1: {ctor: '[]'}
 						}
