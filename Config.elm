@@ -3,6 +3,7 @@ module Config
         ( Config
         , Msg(..)
         , default
+        , defaultHeight
         , defaultWidth
         , defaultXMargin
         , defaultYMargin
@@ -12,6 +13,7 @@ module Config
 
 type alias Config =
     { width : Maybe Int
+    , height : Maybe Int
     , xMargin : Maybe Int
     , yMargin : Maybe Int
     }
@@ -19,11 +21,20 @@ type alias Config =
 
 default : Config
 default =
-    Config (Just defaultWidth) (Just defaultXMargin) (Just defaultYMargin)
+    { width = Nothing
+    , height = Nothing
+    , xMargin = Nothing
+    , yMargin = Nothing
+    }
 
 
 defaultWidth : Int
 defaultWidth =
+    240
+
+
+defaultHeight : Int
+defaultHeight =
     240
 
 
@@ -40,8 +51,11 @@ defaultYMargin =
 type Msg
     = NoOp
     | UpdateWidth String
+    | UpdateHeight String
     | UpdateXMargin String
     | UpdateYMargin String
+    | ToggleWidth
+    | ToggleHeight
 
 
 update : Msg -> Config -> Config
@@ -53,11 +67,34 @@ update msg config =
         UpdateWidth widthStr ->
             { config | width = stringToMaybeInt default.width widthStr }
 
+        UpdateHeight heightStr ->
+            { config | height = stringToMaybeInt default.height heightStr }
+
         UpdateXMargin xMarginStr ->
             { config | xMargin = stringToMaybeInt default.xMargin xMarginStr }
 
         UpdateYMargin yMarginStr ->
             { config | yMargin = stringToMaybeInt default.yMargin yMarginStr }
+
+        ToggleWidth ->
+            let
+                width =
+                    if config.width == Nothing then
+                        Just defaultWidth
+                    else
+                        Nothing
+            in
+            { config | width = width }
+
+        ToggleHeight ->
+            let
+                height =
+                    if config.height == Nothing then
+                        Just defaultHeight
+                    else
+                        Nothing
+            in
+            { config | height = height }
 
 
 stringToMaybeInt : Maybe Int -> String -> Maybe Int

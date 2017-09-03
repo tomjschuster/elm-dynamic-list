@@ -7,16 +7,18 @@ footer code {
   display: inline-block;
 }
 
-.control-panel fieldset > div {
-  display: inline-block;
-}
-
-.control-panel label {
+.control-panel .item-generator label {
   display: block;
 }
 
+.control-panel label {
+  display: inline-block;
+  width: 100px;
+}
+
 .control-panel input {
-  width: 50px;
+  width: 100px;
+  text-align: center;
 }
 
 .item {

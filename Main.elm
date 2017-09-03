@@ -4,8 +4,6 @@ import Config exposing (Config)
 import Html exposing (Html, button, code, div, fieldset, footer, h1, h2, header, input, label, main_, p, text)
 import Html.Attributes as Attr
 import Html.Events as Events
-import Json.Decode as JD
-import Json.Encode exposing (Value)
 import Mouse
 import Random
 
@@ -51,8 +49,8 @@ type alias Item =
 
 
 type alias Dimensions =
-    { height : Float
-    , width : Float
+    { height : Int
+    , width : Int
     }
 
 
@@ -115,7 +113,7 @@ update msg model =
             { model | draggedItemId = Nothing } => Cmd.none
 
 
-tupleToDimensions : ( Float, Float ) -> Dimensions
+tupleToDimensions : ( Int, Int ) -> Dimensions
 tupleToDimensions ( height, width ) =
     Dimensions height width
 
@@ -127,8 +125,8 @@ itemGenerator config =
             Config.defaultWidth |> toFloat
     in
     Random.pair
-        (Random.float 50 500)
-        (Random.float width width)
+        (Random.int (Maybe.withDefault 40 config.height) (Maybe.withDefault 480 config.height))
+        (Random.int (Maybe.withDefault 40 config.width) (Maybe.withDefault 480 config.width))
         |> Random.map (tupleToDimensions >> Item)
 
 
@@ -141,10 +139,13 @@ port mouseLeaves : (Mouse.Position -> msg) -> Sub msg
 
 subscriptions : Model -> Sub Msg
 subscriptions { draggedItemId } =
-    Sub.batch
-        [ Mouse.ups ClearDraggedItem
-        , mouseLeaves ClearDraggedItem
-        ]
+    if draggedItemId == Nothing then
+        Sub.none
+    else
+        Sub.batch
+            [ Mouse.ups ClearDraggedItem
+            , mouseLeaves ClearDraggedItem
+            ]
 
 
 
@@ -167,7 +168,7 @@ view model =
 controlPanel : Model -> Html Msg
 controlPanel model =
     div [ Attr.class "control-panel" ]
-        [ fieldset []
+        [ fieldset [ Attr.class "item-generator" ]
             [ div []
                 [ label [] [ text "Item Generator" ]
                 , input
@@ -177,22 +178,50 @@ controlPanel model =
                     , Attr.placeholder "12"
                     ]
                     []
-                , button
-                    [ Events.onClick GenerateRandomItem ]
-                    [ text "Generate" ]
-                , button
-                    [ Events.onClick ClearItems ]
-                    [ text "Clear" ]
+                , div []
+                    [ button
+                        [ Events.onClick GenerateRandomItem ]
+                        [ text "Generate" ]
+                    ]
+                , div []
+                    [ button
+                        [ Events.onClick ClearItems ]
+                        [ text "Clear" ]
+                    ]
                 ]
             ]
         , fieldset []
             [ div []
-                [ label [] [ text "Column Width" ]
+                [ label [] [ text "Width" ]
                 , input
                     [ Attr.type_ "number"
                     , Events.onInput Config.UpdateWidth |> Attr.map UpdateConfig
-                    , Attr.placeholder "240"
+                    , Attr.placeholder "40 - 480"
+                    , Attr.disabled (model.config.width == Nothing)
                     , model.config.width |> viewMaybeInt |> Attr.value
+                    ]
+                    []
+                , input
+                    [ Attr.type_ "checkbox"
+                    , Attr.checked (model.config.width /= Nothing)
+                    , Events.onClick Config.ToggleWidth |> Attr.map UpdateConfig
+                    ]
+                    []
+                ]
+            , div []
+                [ label [] [ text "Height" ]
+                , input
+                    [ Attr.type_ "number"
+                    , Events.onInput Config.UpdateHeight |> Attr.map UpdateConfig
+                    , Attr.placeholder "40-480"
+                    , Attr.disabled (model.config.height == Nothing)
+                    , model.config.height |> viewMaybeInt |> Attr.value
+                    ]
+                    []
+                , input
+                    [ Attr.type_ "checkbox"
+                    , Attr.checked (model.config.height /= Nothing)
+                    , Events.onClick Config.ToggleHeight |> Attr.map UpdateConfig
                     ]
                     []
                 ]
@@ -241,15 +270,15 @@ itemView config draggedItemId { dimensions, id } =
 
 
 itemStyle : Config -> Dimensions -> Html.Attribute Msg
-itemStyle { width, xMargin, yMargin } { height } =
+itemStyle config { width, height } =
     Attr.style
         [ ( "margin"
-          , maybeIntToPx yMargin Config.defaultYMargin
+          , maybeIntToPx config.yMargin Config.defaultYMargin
                 ++ " "
-                ++ maybeIntToPx xMargin Config.defaultXMargin
+                ++ maybeIntToPx config.xMargin Config.defaultXMargin
           )
-        , ( "width", maybeIntToPx width Config.defaultWidth )
-        , ( "height", toString height ++ "px" )
+        , ( "width", width |> toString |> flip (++) "px" )
+        , ( "height", height |> toString |> flip (++) "px" )
         ]
 
 
