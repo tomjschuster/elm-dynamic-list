@@ -9821,104 +9821,18 @@ var _tomjschuster$elm_dynamic_list$Main$controlPanel = function (model) {
 			ctor: '::',
 			_0: A2(
 				_elm_lang$html$Html$fieldset,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('item-generator'),
-					_1: {ctor: '[]'}
-				},
+				{ctor: '[]'},
 				{
 					ctor: '::',
 					_0: A2(
-						_elm_lang$html$Html$div,
+						_elm_lang$html$Html$h2,
 						{ctor: '[]'},
 						{
 							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$label,
-								{ctor: '[]'},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text('Item Generator'),
-									_1: {ctor: '[]'}
-								}),
-							_1: {
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$input,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$value(
-											_tomjschuster$elm_dynamic_list$Main$viewMaybeInt(model.randomItemCount)),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$html$Html_Events$onInput(_tomjschuster$elm_dynamic_list$Main$UpdateRandomItemCount),
-											_1: {
-												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$type_('number'),
-												_1: {
-													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$placeholder('12'),
-													_1: {ctor: '[]'}
-												}
-											}
-										}
-									},
-									{ctor: '[]'}),
-								_1: {
-									ctor: '::',
-									_0: A2(
-										_elm_lang$html$Html$div,
-										{ctor: '[]'},
-										{
-											ctor: '::',
-											_0: A2(
-												_elm_lang$html$Html$button,
-												{
-													ctor: '::',
-													_0: _elm_lang$html$Html_Events$onClick(_tomjschuster$elm_dynamic_list$Main$GenerateRandomItem),
-													_1: {ctor: '[]'}
-												},
-												{
-													ctor: '::',
-													_0: _elm_lang$html$Html$text('Generate'),
-													_1: {ctor: '[]'}
-												}),
-											_1: {ctor: '[]'}
-										}),
-									_1: {
-										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$div,
-											{ctor: '[]'},
-											{
-												ctor: '::',
-												_0: A2(
-													_elm_lang$html$Html$button,
-													{
-														ctor: '::',
-														_0: _elm_lang$html$Html_Events$onClick(_tomjschuster$elm_dynamic_list$Main$ClearItems),
-														_1: {ctor: '[]'}
-													},
-													{
-														ctor: '::',
-														_0: _elm_lang$html$Html$text('Clear'),
-														_1: {ctor: '[]'}
-													}),
-												_1: {ctor: '[]'}
-											}),
-										_1: {ctor: '[]'}
-									}
-								}
-							}
+							_0: _elm_lang$html$Html$text('Control Panel'),
+							_1: {ctor: '[]'}
 						}),
-					_1: {ctor: '[]'}
-				}),
-			_1: {
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$fieldset,
-					{ctor: '[]'},
-					{
+					_1: {
 						ctor: '::',
 						_0: A2(
 							_elm_lang$html$Html$div,
@@ -9926,11 +9840,26 @@ var _tomjschuster$elm_dynamic_list$Main$controlPanel = function (model) {
 							{
 								ctor: '::',
 								_0: A2(
-									_elm_lang$html$Html$label,
-									{ctor: '[]'},
+									_elm_lang$html$Html$div,
 									{
 										ctor: '::',
-										_0: _elm_lang$html$Html$text('Width'),
+										_0: _elm_lang$html$Html_Attributes$class('generate-items'),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$button,
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Events$onClick(_tomjschuster$elm_dynamic_list$Main$GenerateRandomItem),
+												_1: {ctor: '[]'}
+											},
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text('Create Items'),
+												_1: {ctor: '[]'}
+											}),
 										_1: {ctor: '[]'}
 									}),
 								_1: {
@@ -9939,26 +9868,18 @@ var _tomjschuster$elm_dynamic_list$Main$controlPanel = function (model) {
 										_elm_lang$html$Html$input,
 										{
 											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$type_('number'),
+											_0: _elm_lang$html$Html_Attributes$value(
+												_tomjschuster$elm_dynamic_list$Main$viewMaybeInt(model.randomItemCount)),
 											_1: {
 												ctor: '::',
-												_0: A2(
-													_elm_lang$html$Html_Attributes$map,
-													_tomjschuster$elm_dynamic_list$Main$UpdateConfig,
-													_elm_lang$html$Html_Events$onInput(_tomjschuster$elm_dynamic_list$Config$UpdateWidth)),
+												_0: _elm_lang$html$Html_Events$onInput(_tomjschuster$elm_dynamic_list$Main$UpdateRandomItemCount),
 												_1: {
 													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$placeholder('40 - 480'),
+													_0: _elm_lang$html$Html_Attributes$type_('number'),
 													_1: {
 														ctor: '::',
-														_0: _elm_lang$html$Html_Attributes$disabled(
-															_elm_lang$core$Native_Utils.eq(model.config.width, _elm_lang$core$Maybe$Nothing)),
-														_1: {
-															ctor: '::',
-															_0: _elm_lang$html$Html_Attributes$value(
-																_tomjschuster$elm_dynamic_list$Main$viewMaybeInt(model.config.width)),
-															_1: {ctor: '[]'}
-														}
+														_0: _elm_lang$html$Html_Attributes$placeholder('12'),
+														_1: {ctor: '[]'}
 													}
 												}
 											}
@@ -9967,25 +9888,17 @@ var _tomjschuster$elm_dynamic_list$Main$controlPanel = function (model) {
 									_1: {
 										ctor: '::',
 										_0: A2(
-											_elm_lang$html$Html$input,
+											_elm_lang$html$Html$button,
 											{
 												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
-												_1: {
-													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$checked(
-														!_elm_lang$core$Native_Utils.eq(model.config.width, _elm_lang$core$Maybe$Nothing)),
-													_1: {
-														ctor: '::',
-														_0: A2(
-															_elm_lang$html$Html_Attributes$map,
-															_tomjschuster$elm_dynamic_list$Main$UpdateConfig,
-															_elm_lang$html$Html_Events$onClick(_tomjschuster$elm_dynamic_list$Config$ToggleWidth)),
-														_1: {ctor: '[]'}
-													}
-												}
+												_0: _elm_lang$html$Html_Events$onClick(_tomjschuster$elm_dynamic_list$Main$ClearItems),
+												_1: {ctor: '[]'}
 											},
-											{ctor: '[]'}),
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text('Clear'),
+												_1: {ctor: '[]'}
+											}),
 										_1: {ctor: '[]'}
 									}
 								}
@@ -10002,7 +9915,7 @@ var _tomjschuster$elm_dynamic_list$Main$controlPanel = function (model) {
 										{ctor: '[]'},
 										{
 											ctor: '::',
-											_0: _elm_lang$html$Html$text('Height'),
+											_0: _elm_lang$html$Html$text('Width'),
 											_1: {ctor: '[]'}
 										}),
 									_1: {
@@ -10017,18 +9930,18 @@ var _tomjschuster$elm_dynamic_list$Main$controlPanel = function (model) {
 													_0: A2(
 														_elm_lang$html$Html_Attributes$map,
 														_tomjschuster$elm_dynamic_list$Main$UpdateConfig,
-														_elm_lang$html$Html_Events$onInput(_tomjschuster$elm_dynamic_list$Config$UpdateHeight)),
+														_elm_lang$html$Html_Events$onInput(_tomjschuster$elm_dynamic_list$Config$UpdateWidth)),
 													_1: {
 														ctor: '::',
-														_0: _elm_lang$html$Html_Attributes$placeholder('40-480'),
+														_0: _elm_lang$html$Html_Attributes$placeholder('40 - 480'),
 														_1: {
 															ctor: '::',
 															_0: _elm_lang$html$Html_Attributes$disabled(
-																_elm_lang$core$Native_Utils.eq(model.config.height, _elm_lang$core$Maybe$Nothing)),
+																_elm_lang$core$Native_Utils.eq(model.config.width, _elm_lang$core$Maybe$Nothing)),
 															_1: {
 																ctor: '::',
 																_0: _elm_lang$html$Html_Attributes$value(
-																	_tomjschuster$elm_dynamic_list$Main$viewMaybeInt(model.config.height)),
+																	_tomjschuster$elm_dynamic_list$Main$viewMaybeInt(model.config.width)),
 																_1: {ctor: '[]'}
 															}
 														}
@@ -10046,13 +9959,13 @@ var _tomjschuster$elm_dynamic_list$Main$controlPanel = function (model) {
 													_1: {
 														ctor: '::',
 														_0: _elm_lang$html$Html_Attributes$checked(
-															!_elm_lang$core$Native_Utils.eq(model.config.height, _elm_lang$core$Maybe$Nothing)),
+															!_elm_lang$core$Native_Utils.eq(model.config.width, _elm_lang$core$Maybe$Nothing)),
 														_1: {
 															ctor: '::',
 															_0: A2(
 																_elm_lang$html$Html_Attributes$map,
 																_tomjschuster$elm_dynamic_list$Main$UpdateConfig,
-																_elm_lang$html$Html_Events$onClick(_tomjschuster$elm_dynamic_list$Config$ToggleHeight)),
+																_elm_lang$html$Html_Events$onClick(_tomjschuster$elm_dynamic_list$Config$ToggleWidth)),
 															_1: {ctor: '[]'}
 														}
 													}
@@ -10074,7 +9987,7 @@ var _tomjschuster$elm_dynamic_list$Main$controlPanel = function (model) {
 											{ctor: '[]'},
 											{
 												ctor: '::',
-												_0: _elm_lang$html$Html$text('X Margin'),
+												_0: _elm_lang$html$Html$text('Height'),
 												_1: {ctor: '[]'}
 											}),
 										_1: {
@@ -10089,21 +10002,49 @@ var _tomjschuster$elm_dynamic_list$Main$controlPanel = function (model) {
 														_0: A2(
 															_elm_lang$html$Html_Attributes$map,
 															_tomjschuster$elm_dynamic_list$Main$UpdateConfig,
-															_elm_lang$html$Html_Events$onInput(_tomjschuster$elm_dynamic_list$Config$UpdateXMargin)),
+															_elm_lang$html$Html_Events$onInput(_tomjschuster$elm_dynamic_list$Config$UpdateHeight)),
 														_1: {
 															ctor: '::',
-															_0: _elm_lang$html$Html_Attributes$placeholder('12'),
+															_0: _elm_lang$html$Html_Attributes$placeholder('40-480'),
 															_1: {
 																ctor: '::',
-																_0: _elm_lang$html$Html_Attributes$value(
-																	_tomjschuster$elm_dynamic_list$Main$viewMaybeInt(model.config.xMargin)),
-																_1: {ctor: '[]'}
+																_0: _elm_lang$html$Html_Attributes$disabled(
+																	_elm_lang$core$Native_Utils.eq(model.config.height, _elm_lang$core$Maybe$Nothing)),
+																_1: {
+																	ctor: '::',
+																	_0: _elm_lang$html$Html_Attributes$value(
+																		_tomjschuster$elm_dynamic_list$Main$viewMaybeInt(model.config.height)),
+																	_1: {ctor: '[]'}
+																}
 															}
 														}
 													}
 												},
 												{ctor: '[]'}),
-											_1: {ctor: '[]'}
+											_1: {
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$input,
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+														_1: {
+															ctor: '::',
+															_0: _elm_lang$html$Html_Attributes$checked(
+																!_elm_lang$core$Native_Utils.eq(model.config.height, _elm_lang$core$Maybe$Nothing)),
+															_1: {
+																ctor: '::',
+																_0: A2(
+																	_elm_lang$html$Html_Attributes$map,
+																	_tomjschuster$elm_dynamic_list$Main$UpdateConfig,
+																	_elm_lang$html$Html_Events$onClick(_tomjschuster$elm_dynamic_list$Config$ToggleHeight)),
+																_1: {ctor: '[]'}
+															}
+														}
+													},
+													{ctor: '[]'}),
+												_1: {ctor: '[]'}
+											}
 										}
 									}),
 								_1: {
@@ -10118,7 +10059,7 @@ var _tomjschuster$elm_dynamic_list$Main$controlPanel = function (model) {
 												{ctor: '[]'},
 												{
 													ctor: '::',
-													_0: _elm_lang$html$Html$text('Y Margin'),
+													_0: _elm_lang$html$Html$text('X Margin'),
 													_1: {ctor: '[]'}
 												}),
 											_1: {
@@ -10133,14 +10074,14 @@ var _tomjschuster$elm_dynamic_list$Main$controlPanel = function (model) {
 															_0: A2(
 																_elm_lang$html$Html_Attributes$map,
 																_tomjschuster$elm_dynamic_list$Main$UpdateConfig,
-																_elm_lang$html$Html_Events$onInput(_tomjschuster$elm_dynamic_list$Config$UpdateYMargin)),
+																_elm_lang$html$Html_Events$onInput(_tomjschuster$elm_dynamic_list$Config$UpdateXMargin)),
 															_1: {
 																ctor: '::',
 																_0: _elm_lang$html$Html_Attributes$placeholder('12'),
 																_1: {
 																	ctor: '::',
 																	_0: _elm_lang$html$Html_Attributes$value(
-																		_tomjschuster$elm_dynamic_list$Main$viewMaybeInt(model.config.yMargin)),
+																		_tomjschuster$elm_dynamic_list$Main$viewMaybeInt(model.config.xMargin)),
 																	_1: {ctor: '[]'}
 																}
 															}
@@ -10150,13 +10091,58 @@ var _tomjschuster$elm_dynamic_list$Main$controlPanel = function (model) {
 												_1: {ctor: '[]'}
 											}
 										}),
-									_1: {ctor: '[]'}
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$div,
+											{ctor: '[]'},
+											{
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$label,
+													{ctor: '[]'},
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html$text('Y Margin'),
+														_1: {ctor: '[]'}
+													}),
+												_1: {
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$input,
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html_Attributes$type_('number'),
+															_1: {
+																ctor: '::',
+																_0: A2(
+																	_elm_lang$html$Html_Attributes$map,
+																	_tomjschuster$elm_dynamic_list$Main$UpdateConfig,
+																	_elm_lang$html$Html_Events$onInput(_tomjschuster$elm_dynamic_list$Config$UpdateYMargin)),
+																_1: {
+																	ctor: '::',
+																	_0: _elm_lang$html$Html_Attributes$placeholder('12'),
+																	_1: {
+																		ctor: '::',
+																		_0: _elm_lang$html$Html_Attributes$value(
+																			_tomjschuster$elm_dynamic_list$Main$viewMaybeInt(model.config.yMargin)),
+																		_1: {ctor: '[]'}
+																	}
+																}
+															}
+														},
+														{ctor: '[]'}),
+													_1: {ctor: '[]'}
+												}
+											}),
+										_1: {ctor: '[]'}
+									}
 								}
 							}
 						}
-					}),
-				_1: {ctor: '[]'}
-			}
+					}
+				}),
+			_1: {ctor: '[]'}
 		});
 };
 var _tomjschuster$elm_dynamic_list$Main$view = function (model) {

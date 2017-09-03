@@ -5,10 +5,12 @@ footer code {
 
 .control-panel fieldset {
   display: inline-block;
+  height: 100%;
 }
 
-.control-panel .item-generator label {
-  display: block;
+.control-panel .generate-items {
+  display: inline-block;
+  width: 100px;
 }
 
 .control-panel label {
@@ -19,6 +21,9 @@ footer code {
 .control-panel input {
   width: 100px;
   text-align: center;
+}
+.control-panel h2 {
+  margin : 5px;
 }
 
 .item {

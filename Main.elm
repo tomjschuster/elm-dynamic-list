@@ -168,9 +168,14 @@ view model =
 controlPanel : Model -> Html Msg
 controlPanel model =
     div [ Attr.class "control-panel" ]
-        [ fieldset [ Attr.class "item-generator" ]
-            [ div []
-                [ label [] [ text "Item Generator" ]
+        [ fieldset []
+            [ h2 [] [ text "Control Panel" ]
+            , div []
+                [ div [ Attr.class "generate-items" ]
+                    [ button
+                        [ Events.onClick GenerateRandomItem ]
+                        [ text "Create Items" ]
+                    ]
                 , input
                     [ model.randomItemCount |> viewMaybeInt |> Attr.value
                     , Events.onInput UpdateRandomItemCount
@@ -178,20 +183,11 @@ controlPanel model =
                     , Attr.placeholder "12"
                     ]
                     []
-                , div []
-                    [ button
-                        [ Events.onClick GenerateRandomItem ]
-                        [ text "Generate" ]
-                    ]
-                , div []
-                    [ button
-                        [ Events.onClick ClearItems ]
-                        [ text "Clear" ]
-                    ]
+                , button
+                    [ Events.onClick ClearItems ]
+                    [ text "Clear" ]
                 ]
-            ]
-        , fieldset []
-            [ div []
+            , div []
                 [ label [] [ text "Width" ]
                 , input
                     [ Attr.type_ "number"
