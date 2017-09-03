@@ -1,9 +1,11 @@
-module Main exposing (main)
+port module Main exposing (main)
 
 import Config exposing (Config)
 import Html exposing (Html, button, code, div, fieldset, footer, h1, h2, header, input, label, main_, p, text)
 import Html.Attributes as Attr
 import Html.Events as Events
+import Json.Decode as JD
+import Json.Encode exposing (Value)
 import Mouse
 import Random
 
@@ -134,10 +136,14 @@ itemGenerator config =
 -- SUBSCRIPTIONS
 
 
+port mouseLeaves : (Mouse.Position -> msg) -> Sub msg
+
+
 subscriptions : Model -> Sub Msg
-subscriptions model =
+subscriptions { draggedItemId } =
     Sub.batch
         [ Mouse.ups ClearDraggedItem
+        , mouseLeaves ClearDraggedItem
         ]
 
 
