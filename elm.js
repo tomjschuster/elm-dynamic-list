@@ -9672,6 +9672,7 @@ var _tomjschuster$elm_dynamic_list$Main$updateConfigField = F2(
 var _tomjschuster$elm_dynamic_list$Main$defaultItemCount = 12;
 var _tomjschuster$elm_dynamic_list$Main$initialModel = {
 	randomItemCount: _elm_lang$core$Maybe$Just(_tomjschuster$elm_dynamic_list$Main$defaultItemCount),
+	showControlPanel: true,
 	config: _tomjschuster$elm_dynamic_list$Config$default,
 	items: {ctor: '[]'},
 	draggedItemId: _elm_lang$core$Maybe$Nothing
@@ -9695,9 +9696,9 @@ var _tomjschuster$elm_dynamic_list$Main$mouseLeaves = _elm_lang$core$Native_Plat
 				A2(_elm_lang$core$Json_Decode$field, 'y', _elm_lang$core$Json_Decode$int));
 		},
 		A2(_elm_lang$core$Json_Decode$field, 'x', _elm_lang$core$Json_Decode$int)));
-var _tomjschuster$elm_dynamic_list$Main$Model = F4(
-	function (a, b, c, d) {
-		return {randomItemCount: a, config: b, items: c, draggedItemId: d};
+var _tomjschuster$elm_dynamic_list$Main$Model = F5(
+	function (a, b, c, d, e) {
+		return {randomItemCount: a, showControlPanel: b, config: c, items: d, draggedItemId: e};
 	});
 var _tomjschuster$elm_dynamic_list$Main$Item = F2(
 	function (a, b) {
@@ -10443,6 +10444,20 @@ var _tomjschuster$elm_dynamic_list$Main$update = F2(
 		switch (_p17.ctor) {
 			case 'NoOp':
 				return A2(_tomjschuster$elm_dynamic_list$Main_ops['=>'], model, _elm_lang$core$Platform_Cmd$none);
+			case 'ShowControlPanel':
+				return A2(
+					_tomjschuster$elm_dynamic_list$Main_ops['=>'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{showControlPanel: true}),
+					_elm_lang$core$Platform_Cmd$none);
+			case 'HideControlPanel':
+				return A2(
+					_tomjschuster$elm_dynamic_list$Main_ops['=>'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{showControlPanel: false}),
+					_elm_lang$core$Platform_Cmd$none);
 			case 'UpdateRandomItemCount':
 				var _p18 = _p17._0;
 				var randomItemCount = _elm_lang$core$Native_Utils.eq(_p18, '') ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(
@@ -10585,38 +10600,33 @@ var _tomjschuster$elm_dynamic_list$Main$itemGenerator = function (randomItemCoun
 			}
 		});
 };
+var _tomjschuster$elm_dynamic_list$Main$HideControlPanel = {ctor: 'HideControlPanel'};
+var _tomjschuster$elm_dynamic_list$Main$ShowControlPanel = {ctor: 'ShowControlPanel'};
 var _tomjschuster$elm_dynamic_list$Main$controlPanel = function (model) {
-	return A2(
+	return model.showControlPanel ? A2(
 		_elm_lang$html$Html$div,
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('control-panel'),
+			_0: _elm_lang$html$Html_Attributes$class('control-panel show'),
 			_1: {ctor: '[]'}
 		},
 		{
 			ctor: '::',
 			_0: A2(
-				_elm_lang$html$Html$div,
+				_elm_lang$html$Html$button,
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('generate-items'),
-					_1: {ctor: '[]'}
+					_0: _elm_lang$html$Html_Attributes$class('hide-control-panel'),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Events$onClick(_tomjschuster$elm_dynamic_list$Main$HideControlPanel),
+						_1: {ctor: '[]'}
+					}
 				},
 				{
 					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$h2,
-						{ctor: '[]'},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text('Generate Items'),
-							_1: {ctor: '[]'}
-						}),
-					_1: {
-						ctor: '::',
-						_0: _tomjschuster$elm_dynamic_list$Main$itemGenerator(model.randomItemCount),
-						_1: {ctor: '[]'}
-					}
+					_0: _elm_lang$html$Html$text('X'),
+					_1: {ctor: '[]'}
 				}),
 			_1: {
 				ctor: '::',
@@ -10624,68 +10634,64 @@ var _tomjschuster$elm_dynamic_list$Main$controlPanel = function (model) {
 					_elm_lang$html$Html$div,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('item-options'),
+						_0: _elm_lang$html$Html_Attributes$class('generate-items'),
 						_1: {ctor: '[]'}
 					},
 					{
 						ctor: '::',
 						_0: A2(
 							_elm_lang$html$Html$h2,
+							{ctor: '[]'},
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('options-title'),
-								_1: {ctor: '[]'}
-							},
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html$text('Options'),
+								_0: _elm_lang$html$Html$text('Generate Items'),
 								_1: {ctor: '[]'}
 							}),
 						_1: {
 							ctor: '::',
+							_0: _tomjschuster$elm_dynamic_list$Main$itemGenerator(model.randomItemCount),
+							_1: {ctor: '[]'}
+						}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('item-options'),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
 							_0: A2(
-								_elm_lang$html$Html$div,
+								_elm_lang$html$Html$h2,
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$class('options-categories'),
+									_0: _elm_lang$html$Html_Attributes$class('options-title'),
 									_1: {ctor: '[]'}
 								},
 								{
 									ctor: '::',
-									_0: A2(
-										_elm_lang$html$Html$div,
-										{
-											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$class('options-category item-width'),
-											_1: {ctor: '[]'}
-										},
-										{
-											ctor: '::',
-											_0: A2(
-												_elm_lang$html$Html$h3,
-												{ctor: '[]'},
-												{
-													ctor: '::',
-													_0: _elm_lang$html$Html$text('Width'),
-													_1: {ctor: '[]'}
-												}),
-											_1: {
-												ctor: '::',
-												_0: _tomjschuster$elm_dynamic_list$Main$widthModeControl(model.config.widthMode),
-												_1: {
-													ctor: '::',
-													_0: _tomjschuster$elm_dynamic_list$Main$widthFields(model.config),
-													_1: {ctor: '[]'}
-												}
-											}
-										}),
-									_1: {
+									_0: _elm_lang$html$Html$text('Options'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$div,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('options-categories'),
+										_1: {ctor: '[]'}
+									},
+									{
 										ctor: '::',
 										_0: A2(
 											_elm_lang$html$Html$div,
 											{
 												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$class('options-category item-height'),
+												_0: _elm_lang$html$Html_Attributes$class('options-category item-width'),
 												_1: {ctor: '[]'}
 											},
 											{
@@ -10695,15 +10701,15 @@ var _tomjschuster$elm_dynamic_list$Main$controlPanel = function (model) {
 													{ctor: '[]'},
 													{
 														ctor: '::',
-														_0: _elm_lang$html$Html$text('Height'),
+														_0: _elm_lang$html$Html$text('Width'),
 														_1: {ctor: '[]'}
 													}),
 												_1: {
 													ctor: '::',
-													_0: _tomjschuster$elm_dynamic_list$Main$heightModeControl(model.config.heightMode),
+													_0: _tomjschuster$elm_dynamic_list$Main$widthModeControl(model.config.widthMode),
 													_1: {
 														ctor: '::',
-														_0: _tomjschuster$elm_dynamic_list$Main$heightFields(model.config),
+														_0: _tomjschuster$elm_dynamic_list$Main$widthFields(model.config),
 														_1: {ctor: '[]'}
 													}
 												}
@@ -10714,7 +10720,7 @@ var _tomjschuster$elm_dynamic_list$Main$controlPanel = function (model) {
 												_elm_lang$html$Html$div,
 												{
 													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$class('options-category item-margins'),
+													_0: _elm_lang$html$Html_Attributes$class('options-category item-height'),
 													_1: {ctor: '[]'}
 												},
 												{
@@ -10724,24 +10730,76 @@ var _tomjschuster$elm_dynamic_list$Main$controlPanel = function (model) {
 														{ctor: '[]'},
 														{
 															ctor: '::',
-															_0: _elm_lang$html$Html$text('Margins'),
+															_0: _elm_lang$html$Html$text('Height'),
 															_1: {ctor: '[]'}
 														}),
 													_1: {
 														ctor: '::',
-														_0: _tomjschuster$elm_dynamic_list$Main$marginFields(model.config),
-														_1: {ctor: '[]'}
+														_0: _tomjschuster$elm_dynamic_list$Main$heightModeControl(model.config.heightMode),
+														_1: {
+															ctor: '::',
+															_0: _tomjschuster$elm_dynamic_list$Main$heightFields(model.config),
+															_1: {ctor: '[]'}
+														}
 													}
 												}),
-											_1: {ctor: '[]'}
+											_1: {
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$div,
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$class('options-category item-margins'),
+														_1: {ctor: '[]'}
+													},
+													{
+														ctor: '::',
+														_0: A2(
+															_elm_lang$html$Html$h3,
+															{ctor: '[]'},
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html$text('Margins'),
+																_1: {ctor: '[]'}
+															}),
+														_1: {
+															ctor: '::',
+															_0: _tomjschuster$elm_dynamic_list$Main$marginFields(model.config),
+															_1: {ctor: '[]'}
+														}
+													}),
+												_1: {ctor: '[]'}
+											}
 										}
-									}
-								}),
-							_1: {ctor: '[]'}
-						}
-					}),
-				_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}
+						}),
+					_1: {ctor: '[]'}
+				}
 			}
+		}) : A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('control-panel hide'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$button,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Events$onClick(_tomjschuster$elm_dynamic_list$Main$ShowControlPanel),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('Control Panel'),
+					_1: {ctor: '[]'}
+				}),
+			_1: {ctor: '[]'}
 		});
 };
 var _tomjschuster$elm_dynamic_list$Main$view = function (model) {

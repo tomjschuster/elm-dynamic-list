@@ -30,6 +30,7 @@ infixr 9 =>
 
 type alias Model =
     { randomItemCount : Maybe Int
+    , showControlPanel : Bool
     , config : Config
     , items : List Item
     , draggedItemId : Maybe Int
@@ -39,6 +40,7 @@ type alias Model =
 initialModel : Model
 initialModel =
     { randomItemCount = Just defaultItemCount
+    , showControlPanel = True
     , config = Config.default
     , items = []
     , draggedItemId = Nothing
@@ -78,6 +80,8 @@ type alias Dimensions =
 
 type Msg
     = NoOp
+    | ShowControlPanel
+    | HideControlPanel
     | UpdateRandomItemCount String
     | GenerateRandomItem
     | SetItems (List (Int -> Item))
@@ -92,6 +96,12 @@ update msg model =
     case msg of
         NoOp ->
             model => Cmd.none
+
+        ShowControlPanel ->
+            { model | showControlPanel = True } => Cmd.none
+
+        HideControlPanel ->
+            { model | showControlPanel = False } => Cmd.none
 
         UpdateRandomItemCount intString ->
             let
@@ -187,31 +197,40 @@ view model =
 
 controlPanel : Model -> Html Msg
 controlPanel model =
-    div [ Attr.class "control-panel" ]
-        [ div [ Attr.class "generate-items" ]
-            [ h2 [] [ text "Generate Items" ]
-            , itemGenerator model.randomItemCount
-            ]
-        , div [ Attr.class "item-options" ]
-            [ h2 [ Attr.class "options-title" ] [ text "Options" ]
-            , div [ Attr.class "options-categories" ]
-                [ div [ Attr.class "options-category item-width" ]
-                    [ h3 [] [ text "Width" ]
-                    , widthModeControl model.config.widthMode
-                    , widthFields model.config
-                    ]
-                , div [ Attr.class "options-category item-height" ]
-                    [ h3 [] [ text "Height" ]
-                    , heightModeControl model.config.heightMode
-                    , heightFields model.config
-                    ]
-                , div [ Attr.class "options-category item-margins" ]
-                    [ h3 [] [ text "Margins" ]
-                    , marginFields model.config
+    if model.showControlPanel then
+        div [ Attr.class "control-panel show" ]
+            [ button
+                [ Attr.class "hide-control-panel"
+                , Events.onClick HideControlPanel
+                ]
+                [ text "X" ]
+            , div [ Attr.class "generate-items" ]
+                [ h2 [] [ text "Generate Items" ]
+                , itemGenerator model.randomItemCount
+                ]
+            , div [ Attr.class "item-options" ]
+                [ h2 [ Attr.class "options-title" ] [ text "Options" ]
+                , div [ Attr.class "options-categories" ]
+                    [ div [ Attr.class "options-category item-width" ]
+                        [ h3 [] [ text "Width" ]
+                        , widthModeControl model.config.widthMode
+                        , widthFields model.config
+                        ]
+                    , div [ Attr.class "options-category item-height" ]
+                        [ h3 [] [ text "Height" ]
+                        , heightModeControl model.config.heightMode
+                        , heightFields model.config
+                        ]
+                    , div [ Attr.class "options-category item-margins" ]
+                        [ h3 [] [ text "Margins" ]
+                        , marginFields model.config
+                        ]
                     ]
                 ]
             ]
-        ]
+    else
+        div [ Attr.class "control-panel hide" ]
+            [ button [ Events.onClick ShowControlPanel ] [ text "Control Panel" ] ]
 
 
 itemGenerator : Maybe Int -> Html Msg

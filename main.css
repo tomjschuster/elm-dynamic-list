@@ -2,6 +2,9 @@
   font-family: arial;
 }
 
+div {
+  box-sizing: border-box;
+}
 
 
 /* =========================
@@ -11,7 +14,7 @@
 
 .title h1 {
   text-align: center;
-  margin: 0.75em;
+  margin: 0.5em 0 0.25em;
 }
 
 
@@ -32,22 +35,40 @@ footer code {
    Control Panel 
    ========================= */
 
-
 .control-panel {
+  margin: 0.5em auto 1em;
+  padding: 0 0.5em 0.5em;
+}
+
+.control-panel.show {
   width: 50%;
   min-width: 300px;
-  margin: 5px auto;
-  padding: 0 0.5em 0.5em;
   border: 1px solid black;
+  position: relative;
+}
+
+.control-panel.hide {
+  width: 7em;
 }
 
 .control-panel h2, .control-panel h3 {
-  margin: 0.5em 0px;
+  margin: 0.5em 0 0.25em;
   text-align: center;
 }
 
 .control-panel label {
   font-size: 0.75em;
+}
+
+.control-panel .hide-control-panel {
+  position: absolute;
+  padding: 0.25em;
+  right: 1em;
+  top: 1em;
+}
+
+.control-panel .hide-control-panel {
+  cursor: pointer;
 }
 
 .control-panel .item-generator {
