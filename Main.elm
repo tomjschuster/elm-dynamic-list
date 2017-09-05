@@ -261,55 +261,6 @@ widthModeControl widthMode =
         ]
 
 
-widthFields : Config -> Html Msg
-widthFields config =
-    case config.widthMode of
-        Config.FixedWidth ->
-            fixedWidthField config.fixedWidth
-
-        Config.UnknownWidth ->
-            randomWidthFields config
-
-
-fixedWidthField : Maybe Int -> Html Msg
-fixedWidthField width =
-    div [ Attr.class "fixed-field" ]
-        [ input
-            [ Attr.type_ "number"
-            , Events.onInput Config.UpdateFixedWidth |> Attr.map UpdateConfig
-            , Attr.placeholder "240"
-            , width |> viewMaybeInt |> Attr.value
-            ]
-            []
-        ]
-
-
-randomWidthFields : Config -> Html Msg
-randomWidthFields config =
-    div []
-        [ div [ Attr.class "min-max-field" ]
-            [ label [] [ text "Min" ]
-            , input
-                [ Attr.type_ "number"
-                , Events.onInput Config.UpdateMinWidth |> Attr.map UpdateConfig
-                , Attr.placeholder "40"
-                , config.minWidth |> viewMaybeInt |> Attr.value
-                ]
-                []
-            ]
-        , div [ Attr.class "min-max-field" ]
-            [ label [] [ text "Max" ]
-            , input
-                [ Attr.type_ "number"
-                , Events.onInput Config.UpdateMaxWidth |> Attr.map UpdateConfig
-                , Attr.placeholder "480"
-                , config.maxWidth |> viewMaybeInt |> Attr.value
-                ]
-                []
-            ]
-        ]
-
-
 heightModeControl : Config.HeightMode -> Html Msg
 heightModeControl heightMode =
     div []
@@ -338,6 +289,16 @@ heightModeControl heightMode =
         ]
 
 
+widthFields : Config -> Html Msg
+widthFields config =
+    case config.widthMode of
+        Config.FixedWidth ->
+            fixedWidthField config.fixedWidth
+
+        Config.UnknownWidth ->
+            randomWidthFields config
+
+
 heightFields : Config -> Html Msg
 heightFields config =
     case config.heightMode of
@@ -348,12 +309,79 @@ heightFields config =
             randomHeightFields config
 
 
+stringToMaybeInt : Maybe Int -> String -> Maybe Int
+stringToMaybeInt default stringInt =
+    if stringInt == "" then
+        Nothing
+    else
+        String.toInt stringInt
+            |> Result.map Just
+            |> Result.withDefault default
+
+
+updateIntField : (Maybe Int -> msg) -> Maybe Int -> String -> msg
+updateIntField toMsg default stringInt =
+    stringToMaybeInt default stringInt |> toMsg
+
+
+updateConfigField : (Config -> Maybe Int) -> (Maybe Int -> msg) -> String -> msg
+updateConfigField field toMsg =
+    updateIntField toMsg (Config.default |> field)
+
+
+fixedWidthField : Maybe Int -> Html Msg
+fixedWidthField width =
+    div [ Attr.class "fixed-field" ]
+        [ input
+            [ Attr.type_ "number"
+            , Events.onInput
+                (updateConfigField .fixedWidth Config.UpdateFixedWidth)
+                |> Attr.map UpdateConfig
+            , Attr.placeholder "240"
+            , width |> viewMaybeInt |> Attr.value
+            ]
+            []
+        ]
+
+
+randomWidthFields : Config -> Html Msg
+randomWidthFields config =
+    div []
+        [ div [ Attr.class "min-max-field" ]
+            [ label [] [ text "Min" ]
+            , input
+                [ Attr.type_ "number"
+                , Events.onInput
+                    (updateConfigField .minWidth Config.UpdateMinWidth)
+                    |> Attr.map UpdateConfig
+                , Attr.placeholder "40"
+                , config.minWidth |> viewMaybeInt |> Attr.value
+                ]
+                []
+            ]
+        , div [ Attr.class "min-max-field" ]
+            [ label [] [ text "Max" ]
+            , input
+                [ Attr.type_ "number"
+                , Events.onInput
+                    (updateConfigField .maxWidth Config.UpdateMaxWidth)
+                    |> Attr.map UpdateConfig
+                , Attr.placeholder "480"
+                , config.maxWidth |> viewMaybeInt |> Attr.value
+                ]
+                []
+            ]
+        ]
+
+
 fixedHeightField : Maybe Int -> Html Msg
 fixedHeightField height =
     div [ Attr.class "fixed-field" ]
         [ input
             [ Attr.type_ "number"
-            , Events.onInput Config.UpdateFixedHeight |> Attr.map UpdateConfig
+            , Events.onInput
+                (updateConfigField .fixedHeight Config.UpdateFixedHeight)
+                |> Attr.map UpdateConfig
             , Attr.placeholder "240"
             , height |> viewMaybeInt |> Attr.value
             ]
@@ -368,7 +396,9 @@ randomHeightFields config =
             [ label [] [ text "Min" ]
             , input
                 [ Attr.type_ "number"
-                , Events.onInput Config.UpdateMinHeight |> Attr.map UpdateConfig
+                , Events.onInput
+                    (updateConfigField .minHeight Config.UpdateMinHeight)
+                    |> Attr.map UpdateConfig
                 , Attr.placeholder "40"
                 , config.minHeight |> viewMaybeInt |> Attr.value
                 ]
@@ -378,7 +408,9 @@ randomHeightFields config =
             [ label [] [ text "Max" ]
             , input
                 [ Attr.type_ "number"
-                , Events.onInput Config.UpdateMaxHeight |> Attr.map UpdateConfig
+                , Events.onInput
+                    (updateConfigField .maxHeight Config.UpdateMaxHeight)
+                    |> Attr.map UpdateConfig
                 , Attr.placeholder "480"
                 , config.maxHeight |> viewMaybeInt |> Attr.value
                 ]
@@ -393,7 +425,9 @@ marginFields { xMargin, yMargin } =
         [ label [] [ text "X" ]
         , input
             [ Attr.type_ "number"
-            , Events.onInput Config.UpdateXMargin |> Attr.map UpdateConfig
+            , Events.onInput
+                (updateConfigField .xMargin Config.UpdateXMargin)
+                |> Attr.map UpdateConfig
             , Attr.placeholder "12"
             , xMargin |> viewMaybeInt |> Attr.value
             ]
@@ -401,7 +435,9 @@ marginFields { xMargin, yMargin } =
         , label [] [ text "Y" ]
         , input
             [ Attr.type_ "number"
-            , Events.onInput Config.UpdateYMargin |> Attr.map UpdateConfig
+            , Events.onInput
+                (updateConfigField .yMargin Config.UpdateXMargin)
+                |> Attr.map UpdateConfig
             , Attr.placeholder "12"
             , yMargin |> viewMaybeInt |> Attr.value
             ]

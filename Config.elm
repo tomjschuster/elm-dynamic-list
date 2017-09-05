@@ -101,15 +101,15 @@ defaultYMargin =
 type Msg
     = NoOp
     | UpdateWidthMode WidthMode
-    | UpdateFixedWidth String
-    | UpdateMinWidth String
-    | UpdateMaxWidth String
+    | UpdateFixedWidth (Maybe Int)
+    | UpdateMinWidth (Maybe Int)
+    | UpdateMaxWidth (Maybe Int)
     | UpdateHeightMode HeightMode
-    | UpdateFixedHeight String
-    | UpdateMinHeight String
-    | UpdateMaxHeight String
-    | UpdateXMargin String
-    | UpdateYMargin String
+    | UpdateFixedHeight (Maybe Int)
+    | UpdateMinHeight (Maybe Int)
+    | UpdateMaxHeight (Maybe Int)
+    | UpdateXMargin (Maybe Int)
+    | UpdateYMargin (Maybe Int)
 
 
 update : Msg -> Config -> Config
@@ -121,42 +121,32 @@ update msg config =
         UpdateWidthMode widthMode ->
             { config | widthMode = widthMode }
 
-        UpdateFixedWidth intStr ->
-            { config | fixedWidth = stringToMaybeInt default.fixedWidth intStr }
+        UpdateFixedWidth fixedWidth ->
+            { config | fixedWidth = fixedWidth }
 
-        UpdateMinWidth intStr ->
-            { config | minWidth = stringToMaybeInt default.minWidth intStr }
+        UpdateMinWidth minWidth ->
+            { config | minWidth = minWidth }
 
-        UpdateMaxWidth intStr ->
-            { config | maxWidth = stringToMaybeInt default.maxWidth intStr }
+        UpdateMaxWidth maxWidth ->
+            { config | maxWidth = maxWidth }
 
         UpdateHeightMode heightMode ->
             { config | heightMode = heightMode }
 
-        UpdateFixedHeight intStr ->
-            { config | fixedHeight = stringToMaybeInt default.fixedHeight intStr }
+        UpdateFixedHeight fixedHeight ->
+            { config | fixedHeight = fixedHeight }
 
-        UpdateMinHeight intStr ->
-            { config | minHeight = stringToMaybeInt default.minHeight intStr }
+        UpdateMinHeight minHeight ->
+            { config | minHeight = minHeight }
 
-        UpdateMaxHeight intStr ->
-            { config | maxHeight = stringToMaybeInt default.maxHeight intStr }
+        UpdateMaxHeight maxHeight ->
+            { config | maxHeight = maxHeight }
 
-        UpdateXMargin intStr ->
-            { config | xMargin = stringToMaybeInt default.xMargin intStr }
+        UpdateXMargin xMargin ->
+            { config | xMargin = xMargin }
 
-        UpdateYMargin intStr ->
-            { config | yMargin = stringToMaybeInt default.yMargin intStr }
-
-
-stringToMaybeInt : Maybe Int -> String -> Maybe Int
-stringToMaybeInt default stringInt =
-    if stringInt == "" then
-        Nothing
-    else
-        String.toInt stringInt
-            |> Result.map Just
-            |> Result.withDefault default
+        UpdateYMargin yMargin ->
+            { config | yMargin = yMargin }
 
 
 getWidthRange : Config -> ( Int, Int )
