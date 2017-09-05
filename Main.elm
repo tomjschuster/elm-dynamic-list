@@ -38,8 +38,12 @@ type alias Model =
 
 init : ( Model, Cmd Msg )
 init =
-    Model (Just 12) Config.default [] Nothing
-        => (Random.list 12 (itemGenerator Config.default) |> Random.generate SetItems)
+    Model (Just defaultItemCount) Config.default [] Nothing
+        => (Random.list
+                defaultItemCount
+                (itemGenerator Config.default)
+                |> Random.generate SetItems
+           )
 
 
 type alias Item =
@@ -48,9 +52,14 @@ type alias Item =
     }
 
 
+defaultItemCount : Int
+defaultItemCount =
+    12
+
+
 type alias Dimensions =
-    { height : Int
-    , width : Int
+    { width : Int
+    , height : Int
     }
 
 
@@ -81,7 +90,10 @@ update msg model =
                     if intString == "" then
                         Nothing
                     else
-                        Result.withDefault 12 (String.toInt intString) |> Just
+                        Result.withDefault
+                            defaultItemCount
+                            (String.toInt intString)
+                            |> Just
             in
             { model | randomItemCount = randomItemCount } => Cmd.none
 
@@ -91,15 +103,18 @@ update msg model =
         GenerateRandomItem ->
             model
                 => (Random.list
-                        (Maybe.withDefault 12 model.randomItemCount)
+                        (Maybe.withDefault
+                            defaultItemCount
+                            model.randomItemCount
+                        )
                         (itemGenerator model.config)
                         |> Random.generate SetItems
                    )
 
         SetItems toItems ->
             let
-                ( _, items ) =
-                    List.foldl (\toItem ( id, items ) -> ( id - 1, toItem id :: items )) ( List.length toItems, [] ) toItems
+                items =
+                    List.indexedMap (\idx toItem -> toItem (idx + 1)) toItems
             in
             { model | items = items } => Cmd.none
 
@@ -119,15 +134,30 @@ tupleToDimensions ( height, width ) =
 
 
 itemGenerator : Config -> Random.Generator (Int -> Item)
-itemGenerator config =
-    let
-        width =
-            Config.defaultWidth |> toFloat
-    in
+itemGenerator { width, minWidth, maxWidth, height, minHeight, maxHeight } =
     Random.pair
-        (Random.int (Maybe.withDefault 40 config.height) (Maybe.withDefault 480 config.height))
-        (Random.int (Maybe.withDefault 40 config.width) (Maybe.withDefault 480 config.width))
+        (Random.int
+            (dimensionRangeValue Config.defaultMinWidth width minWidth)
+            (dimensionRangeValue Config.defaultMaxWidth width maxWidth)
+        )
+        (Random.int
+            (dimensionRangeValue Config.defaultMinHeight height minHeight)
+            (dimensionRangeValue Config.defaultMaxHeight height maxHeight)
+        )
         |> Random.map (tupleToDimensions >> Item)
+
+
+dimensionRangeValue : Int -> Maybe Int -> Maybe Int -> Int
+dimensionRangeValue default fixedValue rangeValue =
+    case ( fixedValue, rangeValue ) of
+        ( Nothing, Nothing ) ->
+            default
+
+        ( Just int, _ ) ->
+            int
+
+        ( _, Just int ) ->
+            int
 
 
 
@@ -159,7 +189,9 @@ view model =
         [ header [] [ h1 [] [ text "Elm Dynamic List" ] ]
         , main_ []
             [ controlPanel model
-            , div [] (List.map (itemView model.config model.draggedItemId) model.items)
+            , div
+                [ Attr.class "dynamic-list" ]
+                (List.map (itemView model.config model.draggedItemId) model.items)
             ]
         , footer [] [ code [] [ text <| toString model ] ]
         ]
@@ -188,7 +220,7 @@ controlPanel model =
                     [ text "Clear" ]
                 ]
             , div []
-                [ label [] [ text "Width" ]
+                [ label [] [ text "Fixed Width" ]
                 , input
                     [ Attr.type_ "number"
                     , Events.onInput Config.UpdateWidth |> Attr.map UpdateConfig
@@ -205,7 +237,29 @@ controlPanel model =
                     []
                 ]
             , div []
-                [ label [] [ text "Height" ]
+                [ label [] [ text "Min Width" ]
+                , input
+                    [ Attr.type_ "number"
+                    , Events.onInput Config.UpdateMinWidth |> Attr.map UpdateConfig
+                    , Attr.placeholder "40"
+                    , Attr.disabled (model.config.width /= Nothing)
+                    , model.config.minWidth |> viewMaybeInt |> Attr.value
+                    ]
+                    []
+                ]
+            , div []
+                [ label [] [ text "Max Width" ]
+                , input
+                    [ Attr.type_ "number"
+                    , Events.onInput Config.UpdateMaxWidth |> Attr.map UpdateConfig
+                    , Attr.placeholder "480"
+                    , Attr.disabled (model.config.width /= Nothing)
+                    , model.config.maxWidth |> viewMaybeInt |> Attr.value
+                    ]
+                    []
+                ]
+            , div []
+                [ label [] [ text "Fixed Height" ]
                 , input
                     [ Attr.type_ "number"
                     , Events.onInput Config.UpdateHeight |> Attr.map UpdateConfig
@@ -220,6 +274,28 @@ controlPanel model =
                     , Events.onClick Config.ToggleHeight |> Attr.map UpdateConfig
                     ]
                     []
+                , div []
+                    [ label [] [ text "Min Height" ]
+                    , input
+                        [ Attr.type_ "number"
+                        , Events.onInput Config.UpdateMinHeight |> Attr.map UpdateConfig
+                        , Attr.placeholder "40"
+                        , Attr.disabled (model.config.height /= Nothing)
+                        , model.config.minHeight |> viewMaybeInt |> Attr.value
+                        ]
+                        []
+                    ]
+                , div []
+                    [ label [] [ text "Max Height" ]
+                    , input
+                        [ Attr.type_ "number"
+                        , Events.onInput Config.UpdateMaxHeight |> Attr.map UpdateConfig
+                        , Attr.placeholder "480"
+                        , Attr.disabled (model.config.height /= Nothing)
+                        , model.config.maxHeight |> viewMaybeInt |> Attr.value
+                        ]
+                        []
+                    ]
                 ]
             , div []
                 [ label [] [ text "X Margin" ]

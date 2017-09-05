@@ -4,6 +4,10 @@ module Config
         , Msg(..)
         , default
         , defaultHeight
+        , defaultMaxHeight
+        , defaultMaxWidth
+        , defaultMinHeight
+        , defaultMinWidth
         , defaultWidth
         , defaultXMargin
         , defaultYMargin
@@ -13,7 +17,11 @@ module Config
 
 type alias Config =
     { width : Maybe Int
+    , minWidth : Maybe Int
+    , maxWidth : Maybe Int
     , height : Maybe Int
+    , minHeight : Maybe Int
+    , maxHeight : Maybe Int
     , xMargin : Maybe Int
     , yMargin : Maybe Int
     }
@@ -22,7 +30,11 @@ type alias Config =
 default : Config
 default =
     { width = Nothing
+    , minWidth = Nothing
+    , maxWidth = Nothing
     , height = Nothing
+    , minHeight = Nothing
+    , maxHeight = Nothing
     , xMargin = Nothing
     , yMargin = Nothing
     }
@@ -33,9 +45,29 @@ defaultWidth =
     240
 
 
+defaultMinWidth : Int
+defaultMinWidth =
+    40
+
+
+defaultMaxWidth : Int
+defaultMaxWidth =
+    480
+
+
 defaultHeight : Int
 defaultHeight =
     240
+
+
+defaultMinHeight : Int
+defaultMinHeight =
+    40
+
+
+defaultMaxHeight : Int
+defaultMaxHeight =
+    480
 
 
 defaultXMargin : Int
@@ -51,7 +83,11 @@ defaultYMargin =
 type Msg
     = NoOp
     | UpdateWidth String
+    | UpdateMinWidth String
+    | UpdateMaxWidth String
     | UpdateHeight String
+    | UpdateMinHeight String
+    | UpdateMaxHeight String
     | UpdateXMargin String
     | UpdateYMargin String
     | ToggleWidth
@@ -64,17 +100,29 @@ update msg config =
         NoOp ->
             config
 
-        UpdateWidth widthStr ->
-            { config | width = stringToMaybeInt default.width widthStr }
+        UpdateWidth intStr ->
+            { config | width = stringToMaybeInt default.width intStr }
 
-        UpdateHeight heightStr ->
-            { config | height = stringToMaybeInt default.height heightStr }
+        UpdateMinWidth intStr ->
+            { config | minWidth = stringToMaybeInt default.minWidth intStr }
 
-        UpdateXMargin xMarginStr ->
-            { config | xMargin = stringToMaybeInt default.xMargin xMarginStr }
+        UpdateMaxWidth intStr ->
+            { config | maxWidth = stringToMaybeInt default.maxWidth intStr }
 
-        UpdateYMargin yMarginStr ->
-            { config | yMargin = stringToMaybeInt default.yMargin yMarginStr }
+        UpdateHeight intStr ->
+            { config | height = stringToMaybeInt default.height intStr }
+
+        UpdateMinHeight intStr ->
+            { config | minHeight = stringToMaybeInt default.minHeight intStr }
+
+        UpdateMaxHeight intStr ->
+            { config | maxHeight = stringToMaybeInt default.maxHeight intStr }
+
+        UpdateXMargin intStr ->
+            { config | xMargin = stringToMaybeInt default.xMargin intStr }
+
+        UpdateYMargin intStr ->
+            { config | yMargin = stringToMaybeInt default.yMargin intStr }
 
         ToggleWidth ->
             let
