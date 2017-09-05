@@ -13,6 +13,8 @@ module Config
         , defaultMinWidth
         , defaultXMargin
         , defaultYMargin
+        , getHeightRange
+        , getWidthRange
         , update
         )
 
@@ -155,3 +157,31 @@ stringToMaybeInt default stringInt =
         String.toInt stringInt
             |> Result.map Just
             |> Result.withDefault default
+
+
+getWidthRange : Config -> ( Int, Int )
+getWidthRange config =
+    case config.widthMode of
+        FixedWidth ->
+            ( Maybe.withDefault defaultFixedWidth config.fixedWidth
+            , Maybe.withDefault defaultFixedWidth config.fixedWidth
+            )
+
+        UnknownWidth ->
+            ( Maybe.withDefault defaultMinWidth config.minWidth
+            , Maybe.withDefault defaultMaxWidth config.maxWidth
+            )
+
+
+getHeightRange : Config -> ( Int, Int )
+getHeightRange config =
+    case config.heightMode of
+        FixedHeight ->
+            ( Maybe.withDefault defaultFixedHeight config.fixedHeight
+            , Maybe.withDefault defaultFixedHeight config.fixedHeight
+            )
+
+        UnknownHeight ->
+            ( Maybe.withDefault defaultMinHeight config.minHeight
+            , Maybe.withDefault defaultMaxHeight config.maxHeight
+            )

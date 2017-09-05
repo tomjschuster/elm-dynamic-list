@@ -9439,9 +9439,41 @@ var _tomjschuster$elm_dynamic_list$Config$defaultXMargin = 12;
 var _tomjschuster$elm_dynamic_list$Config$defaultMaxHeight = 480;
 var _tomjschuster$elm_dynamic_list$Config$defaultMinHeight = 40;
 var _tomjschuster$elm_dynamic_list$Config$defaultFixedHeight = 240;
+var _tomjschuster$elm_dynamic_list$Config$getHeightRange = function (config) {
+	var _p0 = config.heightMode;
+	if (_p0.ctor === 'FixedHeight') {
+		return {
+			ctor: '_Tuple2',
+			_0: A2(_elm_lang$core$Maybe$withDefault, _tomjschuster$elm_dynamic_list$Config$defaultFixedHeight, config.fixedHeight),
+			_1: A2(_elm_lang$core$Maybe$withDefault, _tomjschuster$elm_dynamic_list$Config$defaultFixedHeight, config.fixedHeight)
+		};
+	} else {
+		return {
+			ctor: '_Tuple2',
+			_0: A2(_elm_lang$core$Maybe$withDefault, _tomjschuster$elm_dynamic_list$Config$defaultMinHeight, config.minHeight),
+			_1: A2(_elm_lang$core$Maybe$withDefault, _tomjschuster$elm_dynamic_list$Config$defaultMaxHeight, config.maxHeight)
+		};
+	}
+};
 var _tomjschuster$elm_dynamic_list$Config$defaultMaxWidth = 480;
 var _tomjschuster$elm_dynamic_list$Config$defaultMinWidth = 40;
 var _tomjschuster$elm_dynamic_list$Config$defaultFixedWidth = 240;
+var _tomjschuster$elm_dynamic_list$Config$getWidthRange = function (config) {
+	var _p1 = config.widthMode;
+	if (_p1.ctor === 'FixedWidth') {
+		return {
+			ctor: '_Tuple2',
+			_0: A2(_elm_lang$core$Maybe$withDefault, _tomjschuster$elm_dynamic_list$Config$defaultFixedWidth, config.fixedWidth),
+			_1: A2(_elm_lang$core$Maybe$withDefault, _tomjschuster$elm_dynamic_list$Config$defaultFixedWidth, config.fixedWidth)
+		};
+	} else {
+		return {
+			ctor: '_Tuple2',
+			_0: A2(_elm_lang$core$Maybe$withDefault, _tomjschuster$elm_dynamic_list$Config$defaultMinWidth, config.minWidth),
+			_1: A2(_elm_lang$core$Maybe$withDefault, _tomjschuster$elm_dynamic_list$Config$defaultMaxWidth, config.maxWidth)
+		};
+	}
+};
 var _tomjschuster$elm_dynamic_list$Config$Config = function (a) {
 	return function (b) {
 		return function (c) {
@@ -9469,65 +9501,65 @@ var _tomjschuster$elm_dynamic_list$Config$UnknownHeight = {ctor: 'UnknownHeight'
 var _tomjschuster$elm_dynamic_list$Config$default = {widthMode: _tomjschuster$elm_dynamic_list$Config$FixedWidth, fixedWidth: _elm_lang$core$Maybe$Nothing, minWidth: _elm_lang$core$Maybe$Nothing, maxWidth: _elm_lang$core$Maybe$Nothing, heightMode: _tomjschuster$elm_dynamic_list$Config$UnknownHeight, fixedHeight: _elm_lang$core$Maybe$Nothing, minHeight: _elm_lang$core$Maybe$Nothing, maxHeight: _elm_lang$core$Maybe$Nothing, xMargin: _elm_lang$core$Maybe$Nothing, yMargin: _elm_lang$core$Maybe$Nothing};
 var _tomjschuster$elm_dynamic_list$Config$update = F2(
 	function (msg, config) {
-		var _p0 = msg;
-		switch (_p0.ctor) {
+		var _p2 = msg;
+		switch (_p2.ctor) {
 			case 'NoOp':
 				return config;
 			case 'UpdateWidthMode':
 				return _elm_lang$core$Native_Utils.update(
 					config,
-					{widthMode: _p0._0});
+					{widthMode: _p2._0});
 			case 'UpdateFixedWidth':
 				return _elm_lang$core$Native_Utils.update(
 					config,
 					{
-						fixedWidth: A2(_tomjschuster$elm_dynamic_list$Config$stringToMaybeInt, _tomjschuster$elm_dynamic_list$Config$default.fixedWidth, _p0._0)
+						fixedWidth: A2(_tomjschuster$elm_dynamic_list$Config$stringToMaybeInt, _tomjschuster$elm_dynamic_list$Config$default.fixedWidth, _p2._0)
 					});
 			case 'UpdateMinWidth':
 				return _elm_lang$core$Native_Utils.update(
 					config,
 					{
-						minWidth: A2(_tomjschuster$elm_dynamic_list$Config$stringToMaybeInt, _tomjschuster$elm_dynamic_list$Config$default.minWidth, _p0._0)
+						minWidth: A2(_tomjschuster$elm_dynamic_list$Config$stringToMaybeInt, _tomjschuster$elm_dynamic_list$Config$default.minWidth, _p2._0)
 					});
 			case 'UpdateMaxWidth':
 				return _elm_lang$core$Native_Utils.update(
 					config,
 					{
-						maxWidth: A2(_tomjschuster$elm_dynamic_list$Config$stringToMaybeInt, _tomjschuster$elm_dynamic_list$Config$default.maxWidth, _p0._0)
+						maxWidth: A2(_tomjschuster$elm_dynamic_list$Config$stringToMaybeInt, _tomjschuster$elm_dynamic_list$Config$default.maxWidth, _p2._0)
 					});
 			case 'UpdateHeightMode':
 				return _elm_lang$core$Native_Utils.update(
 					config,
-					{heightMode: _p0._0});
+					{heightMode: _p2._0});
 			case 'UpdateFixedHeight':
 				return _elm_lang$core$Native_Utils.update(
 					config,
 					{
-						fixedHeight: A2(_tomjschuster$elm_dynamic_list$Config$stringToMaybeInt, _tomjschuster$elm_dynamic_list$Config$default.fixedHeight, _p0._0)
+						fixedHeight: A2(_tomjschuster$elm_dynamic_list$Config$stringToMaybeInt, _tomjschuster$elm_dynamic_list$Config$default.fixedHeight, _p2._0)
 					});
 			case 'UpdateMinHeight':
 				return _elm_lang$core$Native_Utils.update(
 					config,
 					{
-						minHeight: A2(_tomjschuster$elm_dynamic_list$Config$stringToMaybeInt, _tomjschuster$elm_dynamic_list$Config$default.minHeight, _p0._0)
+						minHeight: A2(_tomjschuster$elm_dynamic_list$Config$stringToMaybeInt, _tomjschuster$elm_dynamic_list$Config$default.minHeight, _p2._0)
 					});
 			case 'UpdateMaxHeight':
 				return _elm_lang$core$Native_Utils.update(
 					config,
 					{
-						maxHeight: A2(_tomjschuster$elm_dynamic_list$Config$stringToMaybeInt, _tomjschuster$elm_dynamic_list$Config$default.maxHeight, _p0._0)
+						maxHeight: A2(_tomjschuster$elm_dynamic_list$Config$stringToMaybeInt, _tomjschuster$elm_dynamic_list$Config$default.maxHeight, _p2._0)
 					});
 			case 'UpdateXMargin':
 				return _elm_lang$core$Native_Utils.update(
 					config,
 					{
-						xMargin: A2(_tomjschuster$elm_dynamic_list$Config$stringToMaybeInt, _tomjschuster$elm_dynamic_list$Config$default.xMargin, _p0._0)
+						xMargin: A2(_tomjschuster$elm_dynamic_list$Config$stringToMaybeInt, _tomjschuster$elm_dynamic_list$Config$default.xMargin, _p2._0)
 					});
 			default:
 				return _elm_lang$core$Native_Utils.update(
 					config,
 					{
-						yMargin: A2(_tomjschuster$elm_dynamic_list$Config$stringToMaybeInt, _tomjschuster$elm_dynamic_list$Config$default.yMargin, _p0._0)
+						yMargin: A2(_tomjschuster$elm_dynamic_list$Config$stringToMaybeInt, _tomjschuster$elm_dynamic_list$Config$default.yMargin, _p2._0)
 					});
 		}
 	});
@@ -9684,49 +9716,29 @@ var _tomjschuster$elm_dynamic_list$Main$tupleToDimensions = function (_p3) {
 	return A2(_tomjschuster$elm_dynamic_list$Main$Dimensions, _p4._0, _p4._1);
 };
 var _tomjschuster$elm_dynamic_list$Main$randomItemGenerator = function (config) {
-	var itemMaxHeight = A2(_elm_lang$core$Maybe$withDefault, _tomjschuster$elm_dynamic_list$Config$defaultMaxHeight, config.maxHeight);
-	var itemMinHeight = A2(_elm_lang$core$Maybe$withDefault, _tomjschuster$elm_dynamic_list$Config$defaultMinHeight, config.minHeight);
-	var itemFixedHeight = A2(_elm_lang$core$Maybe$withDefault, _tomjschuster$elm_dynamic_list$Config$defaultFixedHeight, config.fixedHeight);
-	var _p5 = function () {
-		var _p6 = config.heightMode;
-		if (_p6.ctor === 'FixedHeight') {
-			return {ctor: '_Tuple2', _0: itemFixedHeight, _1: itemFixedHeight};
-		} else {
-			return {ctor: '_Tuple2', _0: itemMinHeight, _1: itemMaxHeight};
-		}
-	}();
-	var heightMax = _p5._0;
-	var heightMin = _p5._1;
-	var itemMaxWidth = A2(_elm_lang$core$Maybe$withDefault, _tomjschuster$elm_dynamic_list$Config$defaultMaxWidth, config.maxWidth);
-	var itemMinWidth = A2(_elm_lang$core$Maybe$withDefault, _tomjschuster$elm_dynamic_list$Config$defaultMinWidth, config.minWidth);
-	var itemFixedWidth = A2(_elm_lang$core$Maybe$withDefault, _tomjschuster$elm_dynamic_list$Config$defaultFixedWidth, config.fixedWidth);
-	var _p7 = function () {
-		var _p8 = config.widthMode;
-		if (_p8.ctor === 'FixedWidth') {
-			return {ctor: '_Tuple2', _0: itemFixedWidth, _1: itemFixedHeight};
-		} else {
-			return {ctor: '_Tuple2', _0: itemMinWidth, _1: itemMaxWidth};
-		}
-	}();
-	var widthMin = _p7._0;
-	var widthMax = _p7._1;
 	return A2(
 		_elm_lang$core$Random$map,
-		function (_p9) {
+		function (_p5) {
 			return _tomjschuster$elm_dynamic_list$Main$Item(
-				_tomjschuster$elm_dynamic_list$Main$tupleToDimensions(_p9));
+				_tomjschuster$elm_dynamic_list$Main$tupleToDimensions(_p5));
 		},
 		A2(
 			_elm_lang$core$Random$pair,
-			A2(_elm_lang$core$Random$int, widthMin, widthMax),
-			A2(_elm_lang$core$Random$int, heightMin, heightMax)));
+			A2(
+				_elm_lang$core$Basics$uncurry,
+				_elm_lang$core$Random$int,
+				_tomjschuster$elm_dynamic_list$Config$getWidthRange(config)),
+			A2(
+				_elm_lang$core$Basics$uncurry,
+				_elm_lang$core$Random$int,
+				_tomjschuster$elm_dynamic_list$Config$getHeightRange(config))));
 };
 var _tomjschuster$elm_dynamic_list$Main$ClearDraggedItem = function (a) {
 	return {ctor: 'ClearDraggedItem', _0: a};
 };
-var _tomjschuster$elm_dynamic_list$Main$subscriptions = function (_p10) {
-	var _p11 = _p10;
-	return _elm_lang$core$Native_Utils.eq(_p11.draggedItemId, _elm_lang$core$Maybe$Nothing) ? _elm_lang$core$Platform_Sub$none : _elm_lang$core$Platform_Sub$batch(
+var _tomjschuster$elm_dynamic_list$Main$subscriptions = function (_p6) {
+	var _p7 = _p6;
+	return _elm_lang$core$Native_Utils.eq(_p7.draggedItemId, _elm_lang$core$Maybe$Nothing) ? _elm_lang$core$Platform_Sub$none : _elm_lang$core$Platform_Sub$batch(
 		{
 			ctor: '::',
 			_0: _elm_lang$mouse$Mouse$ups(_tomjschuster$elm_dynamic_list$Main$ClearDraggedItem),
@@ -9741,9 +9753,9 @@ var _tomjschuster$elm_dynamic_list$Main$SetDraggedItem = function (a) {
 	return {ctor: 'SetDraggedItem', _0: a};
 };
 var _tomjschuster$elm_dynamic_list$Main$itemView = F3(
-	function (config, draggedItemId, _p12) {
-		var _p13 = _p12;
-		var _p14 = _p13.id;
+	function (config, draggedItemId, _p8) {
+		var _p9 = _p8;
+		var _p10 = _p9.id;
 		return A2(
 			_elm_lang$html$Html$div,
 			{
@@ -9757,26 +9769,26 @@ var _tomjschuster$elm_dynamic_list$Main$itemView = F3(
 							_0: {
 								ctor: '_Tuple2',
 								_0: 'dragged',
-								_1: A2(_tomjschuster$elm_dynamic_list$Main$compareIds, draggedItemId, _p14)
+								_1: A2(_tomjschuster$elm_dynamic_list$Main$compareIds, draggedItemId, _p10)
 							},
 							_1: {ctor: '[]'}
 						}
 					}),
 				_1: {
 					ctor: '::',
-					_0: A2(_tomjschuster$elm_dynamic_list$Main$itemStyle, config, _p13.dimensions),
+					_0: A2(_tomjschuster$elm_dynamic_list$Main$itemStyle, config, _p9.dimensions),
 					_1: {
 						ctor: '::',
 						_0: _elm_lang$html$Html_Events$onMouseDown(
-							_tomjschuster$elm_dynamic_list$Main$SetDraggedItem(_p14)),
+							_tomjschuster$elm_dynamic_list$Main$SetDraggedItem(_p10)),
 						_1: {ctor: '[]'}
 					}
 				}
 			},
 			{ctor: '[]'});
 	});
-var _tomjschuster$elm_dynamic_list$Main$items = function (_p15) {
-	var _p16 = _p15;
+var _tomjschuster$elm_dynamic_list$Main$items = function (_p11) {
+	var _p12 = _p11;
 	return A2(
 		_elm_lang$html$Html$div,
 		{
@@ -9786,8 +9798,8 @@ var _tomjschuster$elm_dynamic_list$Main$items = function (_p15) {
 		},
 		A2(
 			_elm_lang$core$List$map,
-			A2(_tomjschuster$elm_dynamic_list$Main$itemView, _p16.config, _p16.draggedItemId),
-			_p16.items));
+			A2(_tomjschuster$elm_dynamic_list$Main$itemView, _p12.config, _p12.draggedItemId),
+			_p12.items));
 };
 var _tomjschuster$elm_dynamic_list$Main$UpdateConfig = function (a) {
 	return {ctor: 'UpdateConfig', _0: a};
@@ -10010,8 +10022,8 @@ var _tomjschuster$elm_dynamic_list$Main$randomWidthFields = function (config) {
 		});
 };
 var _tomjschuster$elm_dynamic_list$Main$widthFields = function (config) {
-	var _p17 = config.widthMode;
-	if (_p17.ctor === 'FixedWidth') {
+	var _p13 = config.widthMode;
+	if (_p13.ctor === 'FixedWidth') {
 		return _tomjschuster$elm_dynamic_list$Main$fixedWidthField(config.fixedWidth);
 	} else {
 		return _tomjschuster$elm_dynamic_list$Main$randomWidthFields(config);
@@ -10235,15 +10247,15 @@ var _tomjschuster$elm_dynamic_list$Main$randomHeightFields = function (config) {
 		});
 };
 var _tomjschuster$elm_dynamic_list$Main$heightFields = function (config) {
-	var _p18 = config.heightMode;
-	if (_p18.ctor === 'FixedHeight') {
+	var _p14 = config.heightMode;
+	if (_p14.ctor === 'FixedHeight') {
 		return _tomjschuster$elm_dynamic_list$Main$fixedHeightField(config.fixedHeight);
 	} else {
 		return _tomjschuster$elm_dynamic_list$Main$randomHeightFields(config);
 	}
 };
-var _tomjschuster$elm_dynamic_list$Main$marginFields = function (_p19) {
-	var _p20 = _p19;
+var _tomjschuster$elm_dynamic_list$Main$marginFields = function (_p15) {
+	var _p16 = _p15;
 	return A2(
 		_elm_lang$html$Html$div,
 		{ctor: '[]'},
@@ -10276,7 +10288,7 @@ var _tomjschuster$elm_dynamic_list$Main$marginFields = function (_p19) {
 								_1: {
 									ctor: '::',
 									_0: _elm_lang$html$Html_Attributes$value(
-										_tomjschuster$elm_dynamic_list$Main$viewMaybeInt(_p20.xMargin)),
+										_tomjschuster$elm_dynamic_list$Main$viewMaybeInt(_p16.xMargin)),
 									_1: {ctor: '[]'}
 								}
 							}
@@ -10312,7 +10324,7 @@ var _tomjschuster$elm_dynamic_list$Main$marginFields = function (_p19) {
 										_1: {
 											ctor: '::',
 											_0: _elm_lang$html$Html_Attributes$value(
-												_tomjschuster$elm_dynamic_list$Main$viewMaybeInt(_p20.yMargin)),
+												_tomjschuster$elm_dynamic_list$Main$viewMaybeInt(_p16.yMargin)),
 											_1: {ctor: '[]'}
 										}
 									}
@@ -10341,17 +10353,17 @@ var _tomjschuster$elm_dynamic_list$Main$init = A2(
 			_tomjschuster$elm_dynamic_list$Main$randomItemGenerator(_tomjschuster$elm_dynamic_list$Main$initialModel.config))));
 var _tomjschuster$elm_dynamic_list$Main$update = F2(
 	function (msg, model) {
-		var _p21 = msg;
-		switch (_p21.ctor) {
+		var _p17 = msg;
+		switch (_p17.ctor) {
 			case 'NoOp':
 				return A2(_tomjschuster$elm_dynamic_list$Main_ops['=>'], model, _elm_lang$core$Platform_Cmd$none);
 			case 'UpdateRandomItemCount':
-				var _p22 = _p21._0;
-				var randomItemCount = _elm_lang$core$Native_Utils.eq(_p22, '') ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(
+				var _p18 = _p17._0;
+				var randomItemCount = _elm_lang$core$Native_Utils.eq(_p18, '') ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(
 					A2(
 						_elm_lang$core$Result$withDefault,
 						_tomjschuster$elm_dynamic_list$Main$defaultItemCount,
-						_elm_lang$core$String$toInt(_p22)));
+						_elm_lang$core$String$toInt(_p18)));
 				return A2(
 					_tomjschuster$elm_dynamic_list$Main_ops['=>'],
 					_elm_lang$core$Native_Utils.update(
@@ -10376,7 +10388,7 @@ var _tomjschuster$elm_dynamic_list$Main$update = F2(
 						function (idx, toItem) {
 							return toItem(idx + 1);
 						}),
-					_p21._0);
+					_p17._0);
 				return A2(
 					_tomjschuster$elm_dynamic_list$Main_ops['=>'],
 					_elm_lang$core$Native_Utils.update(
@@ -10398,7 +10410,7 @@ var _tomjschuster$elm_dynamic_list$Main$update = F2(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
-							config: A2(_tomjschuster$elm_dynamic_list$Config$update, _p21._0, model.config)
+							config: A2(_tomjschuster$elm_dynamic_list$Config$update, _p17._0, model.config)
 						}),
 					_elm_lang$core$Platform_Cmd$none);
 			case 'SetDraggedItem':
@@ -10407,7 +10419,7 @@ var _tomjschuster$elm_dynamic_list$Main$update = F2(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
-							draggedItemId: _elm_lang$core$Maybe$Just(_p21._0)
+							draggedItemId: _elm_lang$core$Maybe$Just(_p17._0)
 						}),
 					_elm_lang$core$Platform_Cmd$none);
 			default:

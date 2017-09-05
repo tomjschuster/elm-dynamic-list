@@ -144,44 +144,9 @@ tupleToDimensions ( height, width ) =
 
 randomItemGenerator : Config -> Random.Generator (Int -> Item)
 randomItemGenerator config =
-    let
-        itemFixedWidth =
-            Maybe.withDefault Config.defaultFixedWidth config.fixedWidth
-
-        itemMinWidth =
-            Maybe.withDefault Config.defaultMinWidth config.minWidth
-
-        itemMaxWidth =
-            Maybe.withDefault Config.defaultMaxWidth config.maxWidth
-
-        itemFixedHeight =
-            Maybe.withDefault Config.defaultFixedHeight config.fixedHeight
-
-        itemMinHeight =
-            Maybe.withDefault Config.defaultMinHeight config.minHeight
-
-        itemMaxHeight =
-            Maybe.withDefault Config.defaultMaxHeight config.maxHeight
-
-        ( widthMin, widthMax ) =
-            case config.widthMode of
-                Config.FixedWidth ->
-                    ( itemFixedWidth, itemFixedHeight )
-
-                Config.UnknownWidth ->
-                    ( itemMinWidth, itemMaxWidth )
-
-        ( heightMax, heightMin ) =
-            case config.heightMode of
-                Config.FixedHeight ->
-                    ( itemFixedHeight, itemFixedHeight )
-
-                Config.UnknownHeight ->
-                    ( itemMinHeight, itemMaxHeight )
-    in
     Random.pair
-        (Random.int widthMin widthMax)
-        (Random.int heightMin heightMax)
+        (Config.getWidthRange config |> uncurry Random.int)
+        (Config.getHeightRange config |> uncurry Random.int)
         |> Random.map (tupleToDimensions >> Item)
 
 
