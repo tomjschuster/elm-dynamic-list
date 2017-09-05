@@ -31,8 +31,6 @@ infixr 9 =>
 type alias Model =
     { randomItemCount : Maybe Int
     , config : Config
-    , widthMode : WidthMode
-    , heightMode : HeightMode
     , items : List Item
     , draggedItemId : Maybe Int
     }
@@ -42,8 +40,6 @@ initialModel : Model
 initialModel =
     { randomItemCount = Just defaultItemCount
     , config = Config.default
-    , widthMode = FixedWidth
-    , heightMode = UnknownHeight
     , items = []
     , draggedItemId = Nothing
     }
@@ -54,19 +50,9 @@ init =
     initialModel
         => (Random.list
                 defaultItemCount
-                (randomItemGenerator initialModel)
+                (randomItemGenerator initialModel.config)
                 |> Random.generate SetItems
            )
-
-
-type WidthMode
-    = FixedWidth
-    | UnknownWidth
-
-
-type HeightMode
-    = FixedHeight
-    | UnknownHeight
 
 
 type alias Item =
@@ -93,8 +79,6 @@ type alias Dimensions =
 type Msg
     = NoOp
     | UpdateRandomItemCount String
-    | UpdateWidthMode WidthMode
-    | UpdateHeightMode HeightMode
     | GenerateRandomItem
     | SetItems (List (Int -> Item))
     | ClearItems
@@ -129,7 +113,7 @@ update msg model =
                             defaultItemCount
                             model.randomItemCount
                         )
-                        (randomItemGenerator model)
+                        (randomItemGenerator model.config)
                         |> Random.generate SetItems
                    )
 
@@ -142,12 +126,6 @@ update msg model =
 
         ClearItems ->
             { model | items = [] } => Cmd.none
-
-        UpdateHeightMode heightMode ->
-            { model | heightMode = heightMode } => Cmd.none
-
-        UpdateWidthMode widthMode ->
-            { model | widthMode = widthMode } => Cmd.none
 
         UpdateConfig configMsg ->
             { model | config = Config.update configMsg model.config } => Cmd.none
@@ -164,11 +142,11 @@ tupleToDimensions ( height, width ) =
     Dimensions height width
 
 
-randomItemGenerator : Model -> Random.Generator (Int -> Item)
-randomItemGenerator { widthMode, heightMode, config } =
+randomItemGenerator : Config -> Random.Generator (Int -> Item)
+randomItemGenerator config =
     let
-        itemWidth =
-            Maybe.withDefault Config.defaultWidth config.width
+        itemFixedWidth =
+            Maybe.withDefault Config.defaultFixedWidth config.fixedWidth
 
         itemMinWidth =
             Maybe.withDefault Config.defaultMinWidth config.minWidth
@@ -176,8 +154,8 @@ randomItemGenerator { widthMode, heightMode, config } =
         itemMaxWidth =
             Maybe.withDefault Config.defaultMaxWidth config.maxWidth
 
-        itemHeight =
-            Maybe.withDefault Config.defaultHeight config.height
+        itemFixedHeight =
+            Maybe.withDefault Config.defaultFixedHeight config.fixedHeight
 
         itemMinHeight =
             Maybe.withDefault Config.defaultMinHeight config.minHeight
@@ -186,19 +164,19 @@ randomItemGenerator { widthMode, heightMode, config } =
             Maybe.withDefault Config.defaultMaxHeight config.maxHeight
 
         ( widthMin, widthMax ) =
-            case widthMode of
-                FixedWidth ->
-                    ( itemWidth, itemHeight )
+            case config.widthMode of
+                Config.FixedWidth ->
+                    ( itemFixedWidth, itemFixedHeight )
 
-                UnknownWidth ->
+                Config.UnknownWidth ->
                     ( itemMinWidth, itemMaxWidth )
 
         ( heightMax, heightMin ) =
-            case heightMode of
-                FixedHeight ->
-                    ( itemHeight, itemHeight )
+            case config.heightMode of
+                Config.FixedHeight ->
+                    ( itemFixedHeight, itemFixedHeight )
 
-                UnknownHeight ->
+                Config.UnknownHeight ->
                     ( itemMinHeight, itemMaxHeight )
     in
     Random.pair
@@ -254,13 +232,13 @@ controlPanel model =
                 [ h2 [] [ text "Options" ]
                 , div [ Attr.class "item-width" ]
                     [ h3 [] [ text "Width" ]
-                    , widthModeControl model.widthMode
-                    , widthFields model.widthMode model.config
+                    , widthModeControl model.config.widthMode
+                    , widthFields model.config
                     ]
                 , div [ Attr.class "item-height" ]
                     [ h3 [] [ text "Height" ]
-                    , heightModeControl model.heightMode
-                    , heightFields model.heightMode model.config
+                    , heightModeControl model.config.heightMode
+                    , heightFields model.config
                     ]
                 , div [ Attr.class "item-margins" ]
                     [ h3 [] [ text "Margins" ]
@@ -290,14 +268,16 @@ itemGenerator randomItemCount =
         ]
 
 
-widthModeControl : WidthMode -> Html Msg
+widthModeControl : Config.WidthMode -> Html Msg
 widthModeControl widthMode =
     div []
         [ label []
             [ input
                 [ Attr.type_ "radio"
-                , Events.onClick (UpdateWidthMode FixedWidth)
-                , Attr.checked (widthMode == FixedWidth)
+                , Events.onClick
+                    (Config.UpdateWidthMode Config.FixedWidth)
+                    |> Attr.map UpdateConfig
+                , Attr.checked (widthMode == Config.FixedWidth)
                 ]
                 []
             , text "Fixed"
@@ -305,8 +285,10 @@ widthModeControl widthMode =
         , label []
             [ input
                 [ Attr.type_ "radio"
-                , Events.onClick (UpdateWidthMode UnknownWidth)
-                , Attr.checked (widthMode == UnknownWidth)
+                , Events.onClick
+                    (Config.UpdateWidthMode Config.UnknownWidth)
+                    |> Attr.map UpdateConfig
+                , Attr.checked (widthMode == Config.UnknownWidth)
                 ]
                 []
             , text "Unknown"
@@ -314,13 +296,13 @@ widthModeControl widthMode =
         ]
 
 
-widthFields : WidthMode -> Config -> Html Msg
-widthFields widthMode config =
-    case widthMode of
-        FixedWidth ->
-            fixedWidthField config.width
+widthFields : Config -> Html Msg
+widthFields config =
+    case config.widthMode of
+        Config.FixedWidth ->
+            fixedWidthField config.fixedWidth
 
-        UnknownWidth ->
+        Config.UnknownWidth ->
             randomWidthFields config
 
 
@@ -329,7 +311,7 @@ fixedWidthField width =
     div [ Attr.class "fixed-field" ]
         [ input
             [ Attr.type_ "number"
-            , Events.onInput Config.UpdateWidth |> Attr.map UpdateConfig
+            , Events.onInput Config.UpdateFixedWidth |> Attr.map UpdateConfig
             , Attr.placeholder "240"
             , width |> viewMaybeInt |> Attr.value
             ]
@@ -338,7 +320,7 @@ fixedWidthField width =
 
 
 randomWidthFields : Config -> Html Msg
-randomWidthFields { width, minWidth, maxWidth } =
+randomWidthFields config =
     div []
         [ div [ Attr.class "min-max-field" ]
             [ label [] [ text "Min" ]
@@ -346,7 +328,7 @@ randomWidthFields { width, minWidth, maxWidth } =
                 [ Attr.type_ "number"
                 , Events.onInput Config.UpdateMinWidth |> Attr.map UpdateConfig
                 , Attr.placeholder "40"
-                , minWidth |> viewMaybeInt |> Attr.value
+                , config.minWidth |> viewMaybeInt |> Attr.value
                 ]
                 []
             ]
@@ -356,21 +338,23 @@ randomWidthFields { width, minWidth, maxWidth } =
                 [ Attr.type_ "number"
                 , Events.onInput Config.UpdateMaxWidth |> Attr.map UpdateConfig
                 , Attr.placeholder "480"
-                , maxWidth |> viewMaybeInt |> Attr.value
+                , config.maxWidth |> viewMaybeInt |> Attr.value
                 ]
                 []
             ]
         ]
 
 
-heightModeControl : HeightMode -> Html Msg
+heightModeControl : Config.HeightMode -> Html Msg
 heightModeControl heightMode =
     div []
         [ label []
             [ input
                 [ Attr.type_ "radio"
-                , Events.onClick (UpdateHeightMode FixedHeight)
-                , Attr.checked (heightMode == FixedHeight)
+                , Events.onClick
+                    (Config.UpdateHeightMode Config.FixedHeight)
+                    |> Attr.map UpdateConfig
+                , Attr.checked (heightMode == Config.FixedHeight)
                 ]
                 []
             , text "Fixed"
@@ -378,8 +362,10 @@ heightModeControl heightMode =
         , label []
             [ input
                 [ Attr.type_ "radio"
-                , Events.onClick (UpdateHeightMode UnknownHeight)
-                , Attr.checked (heightMode == UnknownHeight)
+                , Events.onClick
+                    (Config.UpdateHeightMode Config.UnknownHeight)
+                    |> Attr.map UpdateConfig
+                , Attr.checked (heightMode == Config.UnknownHeight)
                 ]
                 []
             , text "Unknown"
@@ -387,13 +373,13 @@ heightModeControl heightMode =
         ]
 
 
-heightFields : HeightMode -> Config -> Html Msg
-heightFields heightMode config =
-    case heightMode of
-        FixedHeight ->
-            fixedHeightField config.height
+heightFields : Config -> Html Msg
+heightFields config =
+    case config.heightMode of
+        Config.FixedHeight ->
+            fixedHeightField config.fixedHeight
 
-        UnknownHeight ->
+        Config.UnknownHeight ->
             randomHeightFields config
 
 
@@ -402,7 +388,7 @@ fixedHeightField height =
     div [ Attr.class "fixed-field" ]
         [ input
             [ Attr.type_ "number"
-            , Events.onInput Config.UpdateHeight |> Attr.map UpdateConfig
+            , Events.onInput Config.UpdateFixedHeight |> Attr.map UpdateConfig
             , Attr.placeholder "240"
             , height |> viewMaybeInt |> Attr.value
             ]

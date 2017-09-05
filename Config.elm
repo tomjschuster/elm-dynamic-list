@@ -1,14 +1,16 @@
 module Config
     exposing
         ( Config
+        , HeightMode(..)
         , Msg(..)
+        , WidthMode(..)
         , default
-        , defaultHeight
+        , defaultFixedHeight
+        , defaultFixedWidth
         , defaultMaxHeight
         , defaultMaxWidth
         , defaultMinHeight
         , defaultMinWidth
-        , defaultWidth
         , defaultXMargin
         , defaultYMargin
         , update
@@ -16,10 +18,12 @@ module Config
 
 
 type alias Config =
-    { width : Maybe Int
+    { widthMode : WidthMode
+    , fixedWidth : Maybe Int
     , minWidth : Maybe Int
     , maxWidth : Maybe Int
-    , height : Maybe Int
+    , heightMode : HeightMode
+    , fixedHeight : Maybe Int
     , minHeight : Maybe Int
     , maxHeight : Maybe Int
     , xMargin : Maybe Int
@@ -27,12 +31,24 @@ type alias Config =
     }
 
 
+type WidthMode
+    = FixedWidth
+    | UnknownWidth
+
+
+type HeightMode
+    = FixedHeight
+    | UnknownHeight
+
+
 default : Config
 default =
-    { width = Nothing
+    { widthMode = FixedWidth
+    , fixedWidth = Nothing
     , minWidth = Nothing
     , maxWidth = Nothing
-    , height = Nothing
+    , heightMode = UnknownHeight
+    , fixedHeight = Nothing
     , minHeight = Nothing
     , maxHeight = Nothing
     , xMargin = Nothing
@@ -40,8 +56,8 @@ default =
     }
 
 
-defaultWidth : Int
-defaultWidth =
+defaultFixedWidth : Int
+defaultFixedWidth =
     240
 
 
@@ -55,8 +71,8 @@ defaultMaxWidth =
     480
 
 
-defaultHeight : Int
-defaultHeight =
+defaultFixedHeight : Int
+defaultFixedHeight =
     240
 
 
@@ -82,16 +98,16 @@ defaultYMargin =
 
 type Msg
     = NoOp
-    | UpdateWidth String
+    | UpdateWidthMode WidthMode
+    | UpdateFixedWidth String
     | UpdateMinWidth String
     | UpdateMaxWidth String
-    | UpdateHeight String
+    | UpdateHeightMode HeightMode
+    | UpdateFixedHeight String
     | UpdateMinHeight String
     | UpdateMaxHeight String
     | UpdateXMargin String
     | UpdateYMargin String
-    | ToggleWidth
-    | ToggleHeight
 
 
 update : Msg -> Config -> Config
@@ -100,8 +116,11 @@ update msg config =
         NoOp ->
             config
 
-        UpdateWidth intStr ->
-            { config | width = stringToMaybeInt default.width intStr }
+        UpdateWidthMode widthMode ->
+            { config | widthMode = widthMode }
+
+        UpdateFixedWidth intStr ->
+            { config | fixedWidth = stringToMaybeInt default.fixedWidth intStr }
 
         UpdateMinWidth intStr ->
             { config | minWidth = stringToMaybeInt default.minWidth intStr }
@@ -109,8 +128,11 @@ update msg config =
         UpdateMaxWidth intStr ->
             { config | maxWidth = stringToMaybeInt default.maxWidth intStr }
 
-        UpdateHeight intStr ->
-            { config | height = stringToMaybeInt default.height intStr }
+        UpdateHeightMode heightMode ->
+            { config | heightMode = heightMode }
+
+        UpdateFixedHeight intStr ->
+            { config | fixedHeight = stringToMaybeInt default.fixedHeight intStr }
 
         UpdateMinHeight intStr ->
             { config | minHeight = stringToMaybeInt default.minHeight intStr }
@@ -123,26 +145,6 @@ update msg config =
 
         UpdateYMargin intStr ->
             { config | yMargin = stringToMaybeInt default.yMargin intStr }
-
-        ToggleWidth ->
-            let
-                width =
-                    if config.width == Nothing then
-                        Just defaultWidth
-                    else
-                        Nothing
-            in
-            { config | width = width }
-
-        ToggleHeight ->
-            let
-                height =
-                    if config.height == Nothing then
-                        Just defaultHeight
-                    else
-                        Nothing
-            in
-            { config | height = height }
 
 
 stringToMaybeInt : Maybe Int -> String -> Maybe Int
