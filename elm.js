@@ -9803,7 +9803,11 @@ var _tomjschuster$elm_dynamic_list$Main$UpdateConfig = function (a) {
 var _tomjschuster$elm_dynamic_list$Main$widthModeControl = function (widthMode) {
 	return A2(
 		_elm_lang$html$Html$div,
-		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('mode-control'),
+			_1: {ctor: '[]'}
+		},
 		{
 			ctor: '::',
 			_0: A2(
@@ -9879,7 +9883,11 @@ var _tomjschuster$elm_dynamic_list$Main$widthModeControl = function (widthMode) 
 var _tomjschuster$elm_dynamic_list$Main$heightModeControl = function (heightMode) {
 	return A2(
 		_elm_lang$html$Html$div,
-		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('mode-control'),
+			_1: {ctor: '[]'}
+		},
 		{
 			ctor: '::',
 			_0: A2(
@@ -9998,7 +10006,11 @@ var _tomjschuster$elm_dynamic_list$Main$fixedWidthField = function (width) {
 var _tomjschuster$elm_dynamic_list$Main$randomWidthFields = function (config) {
 	return A2(
 		_elm_lang$html$Html$div,
-		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('random-fields'),
+			_1: {ctor: '[]'}
+		},
 		{
 			ctor: '::',
 			_0: A2(
@@ -10011,45 +10023,45 @@ var _tomjschuster$elm_dynamic_list$Main$randomWidthFields = function (config) {
 				{
 					ctor: '::',
 					_0: A2(
-						_elm_lang$html$Html$label,
-						{ctor: '[]'},
+						_elm_lang$html$Html$input,
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html$text('Min'),
-							_1: {ctor: '[]'}
-						}),
+							_0: _elm_lang$html$Html_Attributes$type_('number'),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html_Attributes$map,
+									_tomjschuster$elm_dynamic_list$Main$UpdateConfig,
+									_elm_lang$html$Html_Events$onInput(
+										A2(
+											_tomjschuster$elm_dynamic_list$Main$updateConfigField,
+											function (_) {
+												return _.minWidth;
+											},
+											_tomjschuster$elm_dynamic_list$Config$UpdateMinWidth))),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$placeholder('40'),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$value(
+											_tomjschuster$elm_dynamic_list$Main$viewMaybeInt(config.minWidth)),
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						},
+						{ctor: '[]'}),
 					_1: {
 						ctor: '::',
 						_0: A2(
-							_elm_lang$html$Html$input,
+							_elm_lang$html$Html$label,
+							{ctor: '[]'},
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$type_('number'),
-								_1: {
-									ctor: '::',
-									_0: A2(
-										_elm_lang$html$Html_Attributes$map,
-										_tomjschuster$elm_dynamic_list$Main$UpdateConfig,
-										_elm_lang$html$Html_Events$onInput(
-											A2(
-												_tomjschuster$elm_dynamic_list$Main$updateConfigField,
-												function (_) {
-													return _.minWidth;
-												},
-												_tomjschuster$elm_dynamic_list$Config$UpdateMinWidth))),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$placeholder('40'),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$value(
-												_tomjschuster$elm_dynamic_list$Main$viewMaybeInt(config.minWidth)),
-											_1: {ctor: '[]'}
-										}
-									}
-								}
-							},
-							{ctor: '[]'}),
+								_0: _elm_lang$html$Html$text('Min'),
+								_1: {ctor: '[]'}
+							}),
 						_1: {ctor: '[]'}
 					}
 				}),
@@ -10065,45 +10077,45 @@ var _tomjschuster$elm_dynamic_list$Main$randomWidthFields = function (config) {
 					{
 						ctor: '::',
 						_0: A2(
-							_elm_lang$html$Html$label,
-							{ctor: '[]'},
+							_elm_lang$html$Html$input,
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html$text('Max'),
-								_1: {ctor: '[]'}
-							}),
+								_0: _elm_lang$html$Html_Attributes$type_('number'),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html_Attributes$map,
+										_tomjschuster$elm_dynamic_list$Main$UpdateConfig,
+										_elm_lang$html$Html_Events$onInput(
+											A2(
+												_tomjschuster$elm_dynamic_list$Main$updateConfigField,
+												function (_) {
+													return _.maxWidth;
+												},
+												_tomjschuster$elm_dynamic_list$Config$UpdateMaxWidth))),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$placeholder('480'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$value(
+												_tomjschuster$elm_dynamic_list$Main$viewMaybeInt(config.maxWidth)),
+											_1: {ctor: '[]'}
+										}
+									}
+								}
+							},
+							{ctor: '[]'}),
 						_1: {
 							ctor: '::',
 							_0: A2(
-								_elm_lang$html$Html$input,
+								_elm_lang$html$Html$label,
+								{ctor: '[]'},
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$type_('number'),
-									_1: {
-										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html_Attributes$map,
-											_tomjschuster$elm_dynamic_list$Main$UpdateConfig,
-											_elm_lang$html$Html_Events$onInput(
-												A2(
-													_tomjschuster$elm_dynamic_list$Main$updateConfigField,
-													function (_) {
-														return _.maxWidth;
-													},
-													_tomjschuster$elm_dynamic_list$Config$UpdateMaxWidth))),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$placeholder('480'),
-											_1: {
-												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$value(
-													_tomjschuster$elm_dynamic_list$Main$viewMaybeInt(config.maxWidth)),
-												_1: {ctor: '[]'}
-											}
-										}
-									}
-								},
-								{ctor: '[]'}),
+									_0: _elm_lang$html$Html$text('Max'),
+									_1: {ctor: '[]'}
+								}),
 							_1: {ctor: '[]'}
 						}
 					}),
@@ -10118,6 +10130,126 @@ var _tomjschuster$elm_dynamic_list$Main$widthFields = function (config) {
 	} else {
 		return _tomjschuster$elm_dynamic_list$Main$randomWidthFields(config);
 	}
+};
+var _tomjschuster$elm_dynamic_list$Main$randomHeightFields = function (config) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('random-fields'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('min-max-field'),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$input,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$type_('number'),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html_Attributes$map,
+									_tomjschuster$elm_dynamic_list$Main$UpdateConfig,
+									_elm_lang$html$Html_Events$onInput(
+										A2(
+											_tomjschuster$elm_dynamic_list$Main$updateConfigField,
+											function (_) {
+												return _.minHeight;
+											},
+											_tomjschuster$elm_dynamic_list$Config$UpdateMinHeight))),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$placeholder('40'),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$value(
+											_tomjschuster$elm_dynamic_list$Main$viewMaybeInt(config.minHeight)),
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$label,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Min'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('min-max-field'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$input,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$type_('number'),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html_Attributes$map,
+										_tomjschuster$elm_dynamic_list$Main$UpdateConfig,
+										_elm_lang$html$Html_Events$onInput(
+											A2(
+												_tomjschuster$elm_dynamic_list$Main$updateConfigField,
+												function (_) {
+													return _.maxHeight;
+												},
+												_tomjschuster$elm_dynamic_list$Config$UpdateMaxHeight))),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$placeholder('480'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$value(
+												_tomjschuster$elm_dynamic_list$Main$viewMaybeInt(config.maxHeight)),
+											_1: {ctor: '[]'}
+										}
+									}
+								}
+							},
+							{ctor: '[]'}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$label,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('Max'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}
+					}),
+				_1: {ctor: '[]'}
+			}
+		});
 };
 var _tomjschuster$elm_dynamic_list$Main$fixedHeightField = function (height) {
 	return A2(
@@ -10162,122 +10294,6 @@ var _tomjschuster$elm_dynamic_list$Main$fixedHeightField = function (height) {
 			_1: {ctor: '[]'}
 		});
 };
-var _tomjschuster$elm_dynamic_list$Main$randomHeightFields = function (config) {
-	return A2(
-		_elm_lang$html$Html$div,
-		{ctor: '[]'},
-		{
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$div,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('min-max-field'),
-					_1: {ctor: '[]'}
-				},
-				{
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$label,
-						{ctor: '[]'},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text('Min'),
-							_1: {ctor: '[]'}
-						}),
-					_1: {
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$input,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$type_('number'),
-								_1: {
-									ctor: '::',
-									_0: A2(
-										_elm_lang$html$Html_Attributes$map,
-										_tomjschuster$elm_dynamic_list$Main$UpdateConfig,
-										_elm_lang$html$Html_Events$onInput(
-											A2(
-												_tomjschuster$elm_dynamic_list$Main$updateConfigField,
-												function (_) {
-													return _.minHeight;
-												},
-												_tomjschuster$elm_dynamic_list$Config$UpdateMinHeight))),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$placeholder('40'),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$value(
-												_tomjschuster$elm_dynamic_list$Main$viewMaybeInt(config.minHeight)),
-											_1: {ctor: '[]'}
-										}
-									}
-								}
-							},
-							{ctor: '[]'}),
-						_1: {ctor: '[]'}
-					}
-				}),
-			_1: {
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$div,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('min-max-field'),
-						_1: {ctor: '[]'}
-					},
-					{
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$label,
-							{ctor: '[]'},
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html$text('Max'),
-								_1: {ctor: '[]'}
-							}),
-						_1: {
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$input,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$type_('number'),
-									_1: {
-										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html_Attributes$map,
-											_tomjschuster$elm_dynamic_list$Main$UpdateConfig,
-											_elm_lang$html$Html_Events$onInput(
-												A2(
-													_tomjschuster$elm_dynamic_list$Main$updateConfigField,
-													function (_) {
-														return _.maxHeight;
-													},
-													_tomjschuster$elm_dynamic_list$Config$UpdateMaxHeight))),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$placeholder('480'),
-											_1: {
-												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$value(
-													_tomjschuster$elm_dynamic_list$Main$viewMaybeInt(config.maxHeight)),
-												_1: {ctor: '[]'}
-											}
-										}
-									}
-								},
-								{ctor: '[]'}),
-							_1: {ctor: '[]'}
-						}
-					}),
-				_1: {ctor: '[]'}
-			}
-		});
-};
 var _tomjschuster$elm_dynamic_list$Main$heightFields = function (config) {
 	var _p14 = config.heightMode;
 	if (_p14.ctor === 'FixedHeight') {
@@ -10290,60 +10306,75 @@ var _tomjschuster$elm_dynamic_list$Main$marginFields = function (_p15) {
 	var _p16 = _p15;
 	return A2(
 		_elm_lang$html$Html$div,
-		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('margin-fields'),
+			_1: {ctor: '[]'}
+		},
 		{
 			ctor: '::',
 			_0: A2(
-				_elm_lang$html$Html$label,
-				{ctor: '[]'},
+				_elm_lang$html$Html$div,
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html$text('X'),
+					_0: _elm_lang$html$Html_Attributes$class('margin-field'),
 					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$input,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$type_('number'),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html_Attributes$map,
+									_tomjschuster$elm_dynamic_list$Main$UpdateConfig,
+									_elm_lang$html$Html_Events$onInput(
+										A2(
+											_tomjschuster$elm_dynamic_list$Main$updateConfigField,
+											function (_) {
+												return _.xMargin;
+											},
+											_tomjschuster$elm_dynamic_list$Config$UpdateXMargin))),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$placeholder('12'),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$value(
+											_tomjschuster$elm_dynamic_list$Main$viewMaybeInt(_p16.xMargin)),
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$label,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('X'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}
 				}),
 			_1: {
 				ctor: '::',
 				_0: A2(
-					_elm_lang$html$Html$input,
+					_elm_lang$html$Html$div,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$type_('number'),
-						_1: {
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html_Attributes$map,
-								_tomjschuster$elm_dynamic_list$Main$UpdateConfig,
-								_elm_lang$html$Html_Events$onInput(
-									A2(
-										_tomjschuster$elm_dynamic_list$Main$updateConfigField,
-										function (_) {
-											return _.xMargin;
-										},
-										_tomjschuster$elm_dynamic_list$Config$UpdateXMargin))),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$placeholder('12'),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$value(
-										_tomjschuster$elm_dynamic_list$Main$viewMaybeInt(_p16.xMargin)),
-									_1: {ctor: '[]'}
-								}
-							}
-						}
+						_0: _elm_lang$html$Html_Attributes$class('margin-field'),
+						_1: {ctor: '[]'}
 					},
-					{ctor: '[]'}),
-				_1: {
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$label,
-						{ctor: '[]'},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text('Y'),
-							_1: {ctor: '[]'}
-						}),
-					_1: {
+					{
 						ctor: '::',
 						_0: A2(
 							_elm_lang$html$Html$input,
@@ -10375,9 +10406,20 @@ var _tomjschuster$elm_dynamic_list$Main$marginFields = function (_p15) {
 								}
 							},
 							{ctor: '[]'}),
-						_1: {ctor: '[]'}
-					}
-				}
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$label,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('Y'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}
+					}),
+				_1: {ctor: '[]'}
 			}
 		});
 };
@@ -10482,44 +10524,48 @@ var _tomjschuster$elm_dynamic_list$Main$UpdateRandomItemCount = function (a) {
 var _tomjschuster$elm_dynamic_list$Main$itemGenerator = function (randomItemCount) {
 	return A2(
 		_elm_lang$html$Html$div,
-		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('item-generator'),
+			_1: {ctor: '[]'}
+		},
 		{
 			ctor: '::',
 			_0: A2(
-				_elm_lang$html$Html$input,
+				_elm_lang$html$Html$button,
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$value(
-						_tomjschuster$elm_dynamic_list$Main$viewMaybeInt(randomItemCount)),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$html$Html_Events$onInput(_tomjschuster$elm_dynamic_list$Main$UpdateRandomItemCount),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$type_('number'),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$placeholder('12'),
-								_1: {ctor: '[]'}
-							}
-						}
-					}
+					_0: _elm_lang$html$Html_Events$onClick(_tomjschuster$elm_dynamic_list$Main$GenerateRandomItem),
+					_1: {ctor: '[]'}
 				},
-				{ctor: '[]'}),
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('Generate'),
+					_1: {ctor: '[]'}
+				}),
 			_1: {
 				ctor: '::',
 				_0: A2(
-					_elm_lang$html$Html$button,
+					_elm_lang$html$Html$input,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Events$onClick(_tomjschuster$elm_dynamic_list$Main$GenerateRandomItem),
-						_1: {ctor: '[]'}
+						_0: _elm_lang$html$Html_Attributes$value(
+							_tomjschuster$elm_dynamic_list$Main$viewMaybeInt(randomItemCount)),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onInput(_tomjschuster$elm_dynamic_list$Main$UpdateRandomItemCount),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$type_('number'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$placeholder('12'),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
 					},
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html$text('Generate'),
-						_1: {ctor: '[]'}
-					}),
+					{ctor: '[]'}),
 				_1: {
 					ctor: '::',
 					_0: A2(
@@ -10550,59 +10596,67 @@ var _tomjschuster$elm_dynamic_list$Main$controlPanel = function (model) {
 		{
 			ctor: '::',
 			_0: A2(
-				_elm_lang$html$Html$fieldset,
-				{ctor: '[]'},
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('generate-items'),
+					_1: {ctor: '[]'}
+				},
 				{
 					ctor: '::',
 					_0: A2(
-						_elm_lang$html$Html$div,
+						_elm_lang$html$Html$h2,
+						{ctor: '[]'},
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('item-generator'),
+							_0: _elm_lang$html$Html$text('Generate Items'),
 							_1: {ctor: '[]'}
-						},
-						{
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$h2,
-								{ctor: '[]'},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text('Generate Items'),
-									_1: {ctor: '[]'}
-								}),
-							_1: {
-								ctor: '::',
-								_0: _tomjschuster$elm_dynamic_list$Main$itemGenerator(model.randomItemCount),
-								_1: {ctor: '[]'}
-							}
 						}),
 					_1: {
 						ctor: '::',
+						_0: _tomjschuster$elm_dynamic_list$Main$itemGenerator(model.randomItemCount),
+						_1: {ctor: '[]'}
+					}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('item-options'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
 						_0: A2(
-							_elm_lang$html$Html$div,
+							_elm_lang$html$Html$h2,
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('item-options'),
+								_0: _elm_lang$html$Html_Attributes$class('options-title'),
 								_1: {ctor: '[]'}
 							},
 							{
 								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$h2,
-									{ctor: '[]'},
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html$text('Options'),
-										_1: {ctor: '[]'}
-									}),
-								_1: {
+								_0: _elm_lang$html$Html$text('Options'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$div,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('options-categories'),
+									_1: {ctor: '[]'}
+								},
+								{
 									ctor: '::',
 									_0: A2(
 										_elm_lang$html$Html$div,
 										{
 											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$class('item-width'),
+											_0: _elm_lang$html$Html_Attributes$class('options-category item-width'),
 											_1: {ctor: '[]'}
 										},
 										{
@@ -10631,7 +10685,7 @@ var _tomjschuster$elm_dynamic_list$Main$controlPanel = function (model) {
 											_elm_lang$html$Html$div,
 											{
 												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$class('item-height'),
+												_0: _elm_lang$html$Html_Attributes$class('options-category item-height'),
 												_1: {ctor: '[]'}
 											},
 											{
@@ -10660,7 +10714,7 @@ var _tomjschuster$elm_dynamic_list$Main$controlPanel = function (model) {
 												_elm_lang$html$Html$div,
 												{
 													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$class('item-margins'),
+													_0: _elm_lang$html$Html_Attributes$class('options-category item-margins'),
 													_1: {ctor: '[]'}
 												},
 												{
@@ -10682,12 +10736,12 @@ var _tomjschuster$elm_dynamic_list$Main$controlPanel = function (model) {
 											_1: {ctor: '[]'}
 										}
 									}
-								}
-							}),
-						_1: {ctor: '[]'}
-					}
-				}),
-			_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}
+					}),
+				_1: {ctor: '[]'}
+			}
 		});
 };
 var _tomjschuster$elm_dynamic_list$Main$view = function (model) {
@@ -10698,7 +10752,11 @@ var _tomjschuster$elm_dynamic_list$Main$view = function (model) {
 			ctor: '::',
 			_0: A2(
 				_elm_lang$html$Html$header,
-				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('title'),
+					_1: {ctor: '[]'}
+				},
 				{
 					ctor: '::',
 					_0: A2(

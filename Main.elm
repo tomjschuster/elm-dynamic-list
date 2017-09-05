@@ -176,7 +176,7 @@ view : Model -> Html Msg
 view model =
     div
         []
-        [ header [] [ h1 [] [ text "Elm Dynamic List" ] ]
+        [ header [ Attr.class "title" ] [ h1 [] [ text "Elm Dynamic List" ] ]
         , main_ []
             [ controlPanel model
             , items model
@@ -188,24 +188,24 @@ view model =
 controlPanel : Model -> Html Msg
 controlPanel model =
     div [ Attr.class "control-panel" ]
-        [ fieldset []
-            [ div [ Attr.class "item-generator" ]
-                [ h2 [] [ text "Generate Items" ]
-                , itemGenerator model.randomItemCount
-                ]
-            , div [ Attr.class "item-options" ]
-                [ h2 [] [ text "Options" ]
-                , div [ Attr.class "item-width" ]
+        [ div [ Attr.class "generate-items" ]
+            [ h2 [] [ text "Generate Items" ]
+            , itemGenerator model.randomItemCount
+            ]
+        , div [ Attr.class "item-options" ]
+            [ h2 [ Attr.class "options-title" ] [ text "Options" ]
+            , div [ Attr.class "options-categories" ]
+                [ div [ Attr.class "options-category item-width" ]
                     [ h3 [] [ text "Width" ]
                     , widthModeControl model.config.widthMode
                     , widthFields model.config
                     ]
-                , div [ Attr.class "item-height" ]
+                , div [ Attr.class "options-category item-height" ]
                     [ h3 [] [ text "Height" ]
                     , heightModeControl model.config.heightMode
                     , heightFields model.config
                     ]
-                , div [ Attr.class "item-margins" ]
+                , div [ Attr.class "options-category item-margins" ]
                     [ h3 [] [ text "Margins" ]
                     , marginFields model.config
                     ]
@@ -216,17 +216,17 @@ controlPanel model =
 
 itemGenerator : Maybe Int -> Html Msg
 itemGenerator randomItemCount =
-    div []
-        [ input
+    div [ Attr.class "item-generator" ]
+        [ button
+            [ Events.onClick GenerateRandomItem ]
+            [ text "Generate" ]
+        , input
             [ randomItemCount |> viewMaybeInt |> Attr.value
             , Events.onInput UpdateRandomItemCount
             , Attr.type_ "number"
             , Attr.placeholder "12"
             ]
             []
-        , button
-            [ Events.onClick GenerateRandomItem ]
-            [ text "Generate" ]
         , button
             [ Events.onClick ClearItems ]
             [ text "Clear" ]
@@ -235,7 +235,7 @@ itemGenerator randomItemCount =
 
 widthModeControl : Config.WidthMode -> Html Msg
 widthModeControl widthMode =
-    div []
+    div [ Attr.class "mode-control" ]
         [ label []
             [ input
                 [ Attr.type_ "radio"
@@ -263,7 +263,7 @@ widthModeControl widthMode =
 
 heightModeControl : Config.HeightMode -> Html Msg
 heightModeControl heightMode =
-    div []
+    div [ Attr.class "mode-control" ]
         [ label []
             [ input
                 [ Attr.type_ "radio"
@@ -346,10 +346,9 @@ fixedWidthField width =
 
 randomWidthFields : Config -> Html Msg
 randomWidthFields config =
-    div []
+    div [ Attr.class "random-fields" ]
         [ div [ Attr.class "min-max-field" ]
-            [ label [] [ text "Min" ]
-            , input
+            [ input
                 [ Attr.type_ "number"
                 , Events.onInput
                     (updateConfigField .minWidth Config.UpdateMinWidth)
@@ -358,10 +357,10 @@ randomWidthFields config =
                 , config.minWidth |> viewMaybeInt |> Attr.value
                 ]
                 []
+            , label [] [ text "Min" ]
             ]
         , div [ Attr.class "min-max-field" ]
-            [ label [] [ text "Max" ]
-            , input
+            [ input
                 [ Attr.type_ "number"
                 , Events.onInput
                     (updateConfigField .maxWidth Config.UpdateMaxWidth)
@@ -370,6 +369,37 @@ randomWidthFields config =
                 , config.maxWidth |> viewMaybeInt |> Attr.value
                 ]
                 []
+            , label [] [ text "Max" ]
+            ]
+        ]
+
+
+randomHeightFields : Config -> Html Msg
+randomHeightFields config =
+    div [ Attr.class "random-fields" ]
+        [ div [ Attr.class "min-max-field" ]
+            [ input
+                [ Attr.type_ "number"
+                , Events.onInput
+                    (updateConfigField .minHeight Config.UpdateMinHeight)
+                    |> Attr.map UpdateConfig
+                , Attr.placeholder "40"
+                , config.minHeight |> viewMaybeInt |> Attr.value
+                ]
+                []
+            , label [] [ text "Min" ]
+            ]
+        , div [ Attr.class "min-max-field" ]
+            [ input
+                [ Attr.type_ "number"
+                , Events.onInput
+                    (updateConfigField .maxHeight Config.UpdateMaxHeight)
+                    |> Attr.map UpdateConfig
+                , Attr.placeholder "480"
+                , config.maxHeight |> viewMaybeInt |> Attr.value
+                ]
+                []
+            , label [] [ text "Max" ]
             ]
         ]
 
@@ -389,59 +419,33 @@ fixedHeightField height =
         ]
 
 
-randomHeightFields : Config -> Html Msg
-randomHeightFields config =
-    div []
-        [ div [ Attr.class "min-max-field" ]
-            [ label [] [ text "Min" ]
-            , input
-                [ Attr.type_ "number"
-                , Events.onInput
-                    (updateConfigField .minHeight Config.UpdateMinHeight)
-                    |> Attr.map UpdateConfig
-                , Attr.placeholder "40"
-                , config.minHeight |> viewMaybeInt |> Attr.value
-                ]
-                []
-            ]
-        , div [ Attr.class "min-max-field" ]
-            [ label [] [ text "Max" ]
-            , input
-                [ Attr.type_ "number"
-                , Events.onInput
-                    (updateConfigField .maxHeight Config.UpdateMaxHeight)
-                    |> Attr.map UpdateConfig
-                , Attr.placeholder "480"
-                , config.maxHeight |> viewMaybeInt |> Attr.value
-                ]
-                []
-            ]
-        ]
-
-
 marginFields : Config -> Html Msg
 marginFields { xMargin, yMargin } =
-    div []
-        [ label [] [ text "X" ]
-        , input
-            [ Attr.type_ "number"
-            , Events.onInput
-                (updateConfigField .xMargin Config.UpdateXMargin)
-                |> Attr.map UpdateConfig
-            , Attr.placeholder "12"
-            , xMargin |> viewMaybeInt |> Attr.value
+    div [ Attr.class "margin-fields" ]
+        [ div [ Attr.class "margin-field" ]
+            [ input
+                [ Attr.type_ "number"
+                , Events.onInput
+                    (updateConfigField .xMargin Config.UpdateXMargin)
+                    |> Attr.map UpdateConfig
+                , Attr.placeholder "12"
+                , xMargin |> viewMaybeInt |> Attr.value
+                ]
+                []
+            , label [] [ text "X" ]
             ]
-            []
-        , label [] [ text "Y" ]
-        , input
-            [ Attr.type_ "number"
-            , Events.onInput
-                (updateConfigField .yMargin Config.UpdateXMargin)
-                |> Attr.map UpdateConfig
-            , Attr.placeholder "12"
-            , yMargin |> viewMaybeInt |> Attr.value
+        , div [ Attr.class "margin-field" ]
+            [ input
+                [ Attr.type_ "number"
+                , Events.onInput
+                    (updateConfigField .yMargin Config.UpdateXMargin)
+                    |> Attr.map UpdateConfig
+                , Attr.placeholder "12"
+                , yMargin |> viewMaybeInt |> Attr.value
+                ]
+                []
+            , label [] [ text "Y" ]
             ]
-            []
         ]
 
 

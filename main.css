@@ -1,0 +1,112 @@
+* {
+  font-family: arial;
+}
+
+
+
+/* =========================
+   Title
+   ========================= */
+
+
+.title h1 {
+  text-align: center;
+  margin: 0.75em;
+}
+
+
+
+/* =========================
+   Footer
+   ========================= */
+
+
+footer code {
+  max-width: 512px;
+  display: block;
+}
+
+
+
+/* =========================
+   Control Panel 
+   ========================= */
+
+
+.control-panel {
+  width: 50%;
+  min-width: 300px;
+  margin: 5px auto;
+  padding: 0 0.5em 0.5em;
+  border: 1px solid black;
+}
+
+.control-panel h2, .control-panel h3 {
+  margin: 0.5em 0px;
+  text-align: center;
+}
+
+.control-panel label {
+  font-size: 0.75em;
+}
+
+.control-panel .item-generator {
+  display: flex;
+  justify-content: center;
+}
+
+.control-panel .item-generator input {
+  width: 5em;
+}
+
+.control-panel .options-categories {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.control-panel .options-category {
+  width: 30%;
+  margin: 0px 5px;
+  padding: 0.25em;
+  border: 1px solid black;
+}
+
+.control-panel .mode-control label {
+  display: block;
+}
+
+.control-panel .item-margins input,
+.control-panel .fixed-field input,
+.control-panel .min-max-field input {
+  width: 3.5em;
+  text-align: center;
+}
+
+.control-panel .random-fields,
+.control-panel .margin-fields {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+}
+
+.control-panel .min-max-field label,
+.control-panel .min-max-field input,
+.control-panel .margin-field label,
+.control-panel .margin-field input {
+  display: block;
+  text-align: center;
+}
+
+
+/* =========================
+   Items
+   ========================= */
+
+.item {
+  display: inline-block;
+  border: 1px black solid;
+}
+
+.item.dragged {
+  border: 1px black dashed;
+}
