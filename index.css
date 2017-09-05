@@ -8,22 +8,21 @@ footer code {
   height: 100%;
 }
 
-.control-panel .generate-items {
-  display: inline-block;
-  width: 100px;
+.control-panel h2, .control-panel h3 {
+  margin: 5px 0px;
 }
 
-.control-panel label {
-  display: inline-block;
-  width: 100px;
-}
-
-.control-panel input {
-  width: 100px;
+.control-panel .item-generator input,
+.control-panel .item-margins input,
+.control-panel .fixed-field input,
+.control-panel .min-max-field input {
+  width: 40px;
   text-align: center;
 }
-.control-panel h2 {
-  margin : 5px;
+
+
+.control-panel .min-max-field {
+  display: inline-block;
 }
 
 .item {
