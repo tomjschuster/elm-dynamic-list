@@ -35,21 +35,22 @@ footer code {
    Control Panel 
    ========================= */
 
-.control-panel {
+.close-control-panel {
+  width: 7em;
+}
+
+.control-panel, .close-control-panel {
   margin: 0.5em auto 1em;
   padding: 0 0.5em 0.5em;
 }
 
-.control-panel.show {
+.control-panel {
   width: 50%;
   min-width: 300px;
   border: 1px solid black;
   position: relative;
 }
 
-.control-panel.hide {
-  width: 7em;
-}
 
 .control-panel h2, .control-panel h3 {
   margin: 0.5em 0 0.25em;
