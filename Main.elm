@@ -1,11 +1,12 @@
 port module Main exposing (main)
 
-import Config exposing (Config, ExternalMsg)
 import Html exposing (Html, button, code, div, fieldset, footer, h1, h2, h3, header, input, label, main_, p, text)
 import Html.Attributes as Attr
 import Html.Events as Events
+import ItemGenerator
 import Mouse
-import Random
+import Positioning
+import Types exposing (Dimensions)
 import Utils exposing ((=>))
 
 
@@ -24,8 +25,7 @@ main =
 
 
 type alias Model =
-    { showControlPanel : Bool
-    , config : Config
+    { itemGenerator : ItemGenerator.Model
     , items : List Item
     , draggedItemId : Maybe Int
     }
@@ -33,8 +33,7 @@ type alias Model =
 
 initialModel : Model
 initialModel =
-    { showControlPanel = True
-    , config = Config.default
+    { itemGenerator = ItemGenerator.default
     , items = []
     , draggedItemId = Nothing
     }
@@ -42,23 +41,12 @@ initialModel =
 
 init : ( Model, Cmd Msg )
 init =
-    initialModel
-        => (Random.list
-                Config.defaultItemCount
-                (randomItemGenerator initialModel.config)
-                |> Random.generate SetItems
-           )
+    initialModel => (ItemGenerator.init |> Cmd.map ItemGeneratorMsg)
 
 
 type alias Item =
     { dimensions : Dimensions
     , id : Int
-    }
-
-
-type alias Dimensions =
-    { width : Int
-    , height : Int
     }
 
 
@@ -68,10 +56,7 @@ type alias Dimensions =
 
 type Msg
     = NoOp
-    | ShowControlPanel
-    | HideControlPanel
-    | ConfigMsg Config.Msg
-    | SetItems (List (Int -> Item))
+    | ItemGeneratorMsg ItemGenerator.Msg
     | SetDraggedItem Int
     | ClearDraggedItem Mouse.Position
 
@@ -82,61 +67,36 @@ update msg model =
         NoOp ->
             model => Cmd.none
 
-        ShowControlPanel ->
-            { model | showControlPanel = True } => Cmd.none
-
-        HideControlPanel ->
-            { model | showControlPanel = False } => Cmd.none
-
-        SetItems toItems ->
+        ItemGeneratorMsg itemGeneratorMsg ->
             let
-                items =
-                    List.indexedMap (\idx toItem -> toItem (idx + 1)) toItems
-            in
-            { model | items = items } => Cmd.none
+                ( itemGenerator, cmd1, externalMsg ) =
+                    ItemGenerator.update itemGeneratorMsg model.itemGenerator
 
-        ConfigMsg configMsg ->
-            let
-                ( config, externalMsg ) =
-                    Config.update configMsg model.config
-
-                ( updatedModel, cmd ) =
+                ( updatedModel, cmd2 ) =
                     case externalMsg of
-                        Config.NoOp ->
+                        ItemGenerator.NoOp ->
                             model => Cmd.none
 
-                        Config.Close ->
-                            { model | showControlPanel = False } => Cmd.none
+                        ItemGenerator.SetItems dimensions ->
+                            let
+                                items =
+                                    List.indexedMap
+                                        (\idx dim -> Item dim (idx + 1))
+                                        dimensions
+                            in
+                            { model | items = items } => Cmd.none
 
-                        Config.GenerateItems maybeCount ->
-                            model
-                                => (Random.list
-                                        (Maybe.withDefault
-                                            Config.defaultItemCount
-                                            maybeCount
-                                        )
-                                        (randomItemGenerator config)
-                                        |> Random.generate SetItems
-                                   )
-
-                        Config.ClearItems ->
+                        ItemGenerator.ClearItems ->
                             { model | items = [] } => Cmd.none
             in
-            { updatedModel | config = config } => cmd
+            { updatedModel | itemGenerator = itemGenerator }
+                => Cmd.batch [ cmd1 |> Cmd.map ItemGeneratorMsg, cmd2 ]
 
         SetDraggedItem id ->
             { model | draggedItemId = Just id } => Cmd.none
 
         ClearDraggedItem _ ->
             { model | draggedItemId = Nothing } => Cmd.none
-
-
-randomItemGenerator : Config -> Random.Generator (Int -> Item)
-randomItemGenerator config =
-    Random.pair
-        (Config.getWidthRange config |> uncurry Random.int)
-        (Config.getHeightRange config |> uncurry Random.int)
-        |> Random.map (uncurry Dimensions >> Item)
 
 
 
@@ -167,31 +127,18 @@ view model =
         []
         [ header [ Attr.class "title" ] [ h1 [] [ text "Elm Dynamic List" ] ]
         , main_ []
-            [ controlPanel model
+            [ ItemGenerator.view model.itemGenerator |> Html.map ItemGeneratorMsg
             , items model
             ]
         , footer [] [ code [] [ text <| toString model ] ]
         ]
 
 
-controlPanel : Model -> Html Msg
-controlPanel { showControlPanel, config } =
-    if showControlPanel then
-        Config.controlPanel config |> Html.map ConfigMsg
-    else
-        div [ Attr.class "close-control-panel" ]
-            [ button
-                [ Events.onClick ShowControlPanel
-                ]
-                [ text "Control Panel" ]
-            ]
-
-
 items : Model -> Html Msg
-items { config, draggedItemId, items } =
+items { itemGenerator, draggedItemId, items } =
     div
         [ Attr.class "dynamic-list" ]
-        (List.map (itemView config draggedItemId) items)
+        (List.map (itemView itemGenerator draggedItemId) items)
 
 
 compareIds : Maybe Int -> Int -> Bool
@@ -204,23 +151,23 @@ compareIds maybeId currentId =
             False
 
 
-itemView : Config -> Maybe Int -> Item -> Html Msg
-itemView config draggedItemId { dimensions, id } =
+itemView : ItemGenerator.Model -> Maybe Int -> Item -> Html Msg
+itemView itemGenerator draggedItemId { dimensions, id } =
     div
         [ Attr.classList [ ( "item", True ), ( "dragged", compareIds draggedItemId id ) ]
-        , itemStyle config dimensions
+        , itemStyle itemGenerator dimensions
         , Events.onMouseDown (SetDraggedItem id)
         ]
         []
 
 
-itemStyle : Config -> Dimensions -> Html.Attribute Msg
-itemStyle config { width, height } =
+itemStyle : ItemGenerator.Model -> Dimensions -> Html.Attribute Msg
+itemStyle itemGenerator { width, height } =
     Attr.style
         [ ( "margin"
-          , maybeIntToPx config.yMargin Config.defaultYMargin
+          , maybeIntToPx itemGenerator.yMargin ItemGenerator.defaultYMargin
                 ++ " "
-                ++ maybeIntToPx config.xMargin Config.defaultXMargin
+                ++ maybeIntToPx itemGenerator.xMargin ItemGenerator.defaultXMargin
           )
         , ( "width", width |> toString |> flip (++) "px" )
         , ( "height", height |> toString |> flip (++) "px" )
