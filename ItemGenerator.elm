@@ -9,9 +9,12 @@ module ItemGenerator
         , default
         , defaultXMargin
         , defaultYMargin
+        , fixedWidth
         , init
         , update
         , view
+        , xMargin
+        , yMargin
         )
 
 import Html exposing (Html, button, div, fieldset, h2, h3, input, label, text)
@@ -85,6 +88,11 @@ defaultFixedWidth =
     240
 
 
+fixedWidth : Model -> Int
+fixedWidth =
+    .fixedWidth >> Maybe.withDefault defaultFixedWidth
+
+
 defaultMinWidth : Int
 defaultMinWidth =
     40
@@ -115,9 +123,19 @@ defaultXMargin =
     12
 
 
+xMargin : Model -> Int
+xMargin =
+    .xMargin >> Maybe.withDefault defaultXMargin
+
+
 defaultYMargin : Int
 defaultYMargin =
     12
+
+
+yMargin : Model -> Int
+yMargin =
+    .yMargin >> Maybe.withDefault defaultYMargin
 
 
 
