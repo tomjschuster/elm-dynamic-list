@@ -225,19 +225,23 @@ getPositions config =
             let
                 columns =
                     (config.containerWidth - config.xMargin) // (width + config.xMargin)
+
+                leftShift =
+                    rem (config.containerWidth - config.xMargin) (width + config.xMargin) // 2
             in
             List.foldl
-                (getPosition config)
+                (getPosition config leftShift)
                 ( Array.repeat columns 0, [] )
                 >> Tuple.second
 
 
 getPosition :
     Config
+    -> Int
     -> Dimensions
     -> ( Array Int, List Position )
     -> ( Array Int, List Position )
-getPosition config { height } ( columnHeights, positions ) =
+getPosition config leftShift { height } ( columnHeights, positions ) =
     case config.listType of
         FixedWidth width ->
             let
@@ -245,7 +249,7 @@ getPosition config { height } ( columnHeights, positions ) =
                     getMinColumn columnHeights
 
                 translateX =
-                    index * (width + config.xMargin) + config.xMargin
+                    index * (width + config.xMargin) + config.xMargin + leftShift
 
                 newHeight =
                     height + translateY + config.yMargin
