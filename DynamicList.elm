@@ -19,7 +19,7 @@ module DynamicList
         )
 
 import Array exposing (Array)
-import Html exposing (Html, div)
+import Html exposing (Html, div, text)
 import Html.Attributes as Attr
 
 
@@ -176,16 +176,51 @@ setContainerId containerId dynamicList =
 
 
 view : DynamicList msg -> Html msg
-view { config, items, draggedId } =
+view { config, items, draggedId, mousePosition } =
     let
         positions =
             List.map .dimensions items |> getPositions config
+
+        fixedItems =
+            List.map2 (itemView config draggedId) items positions
+
+        allItems =
+            case draggedId of
+                Just id ->
+                    items
+                        |> List.filter (.id >> (==) id)
+                        |> List.head
+                        |> Maybe.map
+                            (draggedItemView config mousePosition >> flip (::) fixedItems)
+                        |> Maybe.withDefault fixedItems
+
+                Nothing ->
+                    fixedItems
     in
     div
         [ Attr.id config.containerId
         , Attr.class "dynamic-list"
         ]
-        (List.map2 (itemView config draggedId) items positions)
+        allItems
+
+
+draggedItemView : Config -> Position -> Item msg -> Html msg
+draggedItemView { listType } { x, y } { dimensions, content } =
+    let
+        (FixedWidth width) =
+            listType
+    in
+    div
+        [ Attr.style
+            [ ( "background-color", "red" )
+            , ( "height", dimensions.height |> toString |> flip (++) "px" )
+            , ( "width", width |> toString |> flip (++) "px" )
+            , ( "position", "absolute" )
+            , ( "left", x |> toString |> flip (++) "px" )
+            , ( "top", y |> toString |> flip (++) "px" )
+            ]
+        ]
+        [ content ]
 
 
 itemView : Config -> Maybe String -> Item msg -> Position -> Html msg
