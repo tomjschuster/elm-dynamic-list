@@ -50,9 +50,6 @@ view { config, items } =
     let
         translations =
             List.map .dimensions items |> getTranslations config
-
-        a =
-            Debug.log "translations" translations
     in
     div
         []
@@ -81,68 +78,59 @@ intToPx =
 
 
 getTranslations : Config -> List Dimensions -> List Translation
-getTranslations config dimensions =
-    ( Array.repeat config.columns 0, [] )
-        |> getTranslationHelper config dimensions
-        |> Tuple.second
+getTranslations config =
+    List.foldl
+        (getTranslation config)
+        ( Array.repeat config.columns 0, [] )
+        >> Tuple.second
 
 
-getTranslationHelper :
+getTranslation :
     Config
-    -> List Dimensions
+    -> Dimensions
     -> ( Array Int, List Translation )
     -> ( Array Int, List Translation )
-getTranslationHelper config dimensions ( columnHeights, translations ) =
+getTranslation config { height } ( columnHeights, translations ) =
     case config.listType of
         FixedWidth width ->
-            case dimensions of
-                [] ->
-                    ( columnHeights, translations )
+            let
+                ( _, index, translateY ) =
+                    getMinColumn columnHeights
 
-                next :: rest ->
-                    let
-                        ( minIndex, minHeight ) =
-                            getMinColumn columnHeights
+                translateX =
+                    index * (width + config.xMargin)
 
-                        newColumnHeights =
-                            Array.set
-                                minIndex
-                                (next.height + config.yMargin)
-                                columnHeights
-
-                        newTranslations =
-                            Translation (getTranslateX config width minIndex) minHeight
-                                |> List.singleton
-                                |> List.append translations
-                    in
-                    getTranslationHelper
-                        config
-                        rest
-                        ( newColumnHeights, newTranslations )
+                newHeight =
+                    height + translateY + config.yMargin
+            in
+            ( updateColumnHeights index newHeight columnHeights
+            , Translation translateX translateY
+                |> List.singleton
+                |> List.append translations
+            )
 
         _ ->
             ( Array.empty, [] )
 
 
-getMinColumn : Array Int -> ( Int, Int )
+updateColumnHeights : Int -> Int -> Array Int -> Array Int
+updateColumnHeights minIndex newHeight heights =
+    Array.set minIndex newHeight heights
+
+
+updateTranslations : Int -> Int -> List Translation -> List Translation
+updateTranslations x y translations =
+    Translation x y
+        |> List.singleton
+        |> List.append translations
+
+
+getMinColumn : Array Int -> ( Int, Int, Int )
 getMinColumn columnHeights =
-    let
-        ( _, minIndex, minHeight ) =
-            Array.foldl
-                compareColumnHeights
-                ( 0, 0, Maybe.withDefault 0 (Array.get 0 columnHeights) )
-                columnHeights
-    in
-    ( minIndex, minHeight )
-
-
-getTranslateX : Config -> Int -> Int -> Int
-getTranslateX config width x =
-    let
-        a =
-            Debug.log "config" x
-    in
-    (*) (width + config.xMargin) x
+    Array.foldl
+        compareColumnHeights
+        ( 0, 0, Maybe.withDefault 0 (Array.get 0 columnHeights) )
+        columnHeights
 
 
 compareColumnHeights : Int -> ( Int, Int, Int ) -> ( Int, Int, Int )
