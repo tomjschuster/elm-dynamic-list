@@ -1,10 +1,11 @@
 port module Main exposing (main)
 
 import DynamicList as DL exposing (DynamicList)
-import Html exposing (Html, button, code, div, fieldset, footer, h1, h2, h3, header, input, label, main_, p, text)
+import Html exposing (Attribute, Html, button, code, div, fieldset, footer, h1, h2, h3, header, input, label, main_, p, text)
 import Html.Attributes as Attr
 import Html.Events as Events
 import ItemGenerator as IG
+import Json.Decode as JD
 import Mouse
 import Types exposing (Dimensions)
 import Utils exposing ((=>))
@@ -26,18 +27,16 @@ main =
 
 type alias Model =
     { itemGenerator : IG.Model
-    , randomItems : List RandomItem
     , columns : Int
-    , draggedItemId : Maybe Int
+    , dynamicList : DynamicList Msg
     }
 
 
 initialModel : Model
 initialModel =
     { itemGenerator = IG.default
-    , randomItems = []
     , columns = 3
-    , draggedItemId = Nothing
+    , dynamicList = DL.empty
     }
 
 
@@ -68,9 +67,10 @@ type alias RandomItem =
 type Msg
     = NoOp
     | ItemGeneratorMsg IG.Msg
-    | SetDraggedItem Int
+    | SetDraggedItem String
     | ClearDraggedItem Mouse.Position
     | CalculateColumns Dimensions
+    | SetMousePosition Mouse.Position
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -91,27 +91,51 @@ update msg model =
 
                         IG.SetItems dimensions ->
                             let
-                                randomItems =
+                                items =
                                     List.indexedMap
-                                        (\idx dim -> RandomItem dim (idx + 1))
+                                        (\idx dim ->
+                                            DL.Item dim
+                                                (idx + 1 |> toString)
+                                                (itemView model.itemGenerator dim (idx + 1 |> toString))
+                                        )
                                         dimensions
                             in
-                            { model | randomItems = randomItems } => Cmd.none
+                            { model | dynamicList = buildList model items }
+                                => Cmd.none
 
                         IG.ClearItems ->
-                            { model | randomItems = [] } => Cmd.none
+                            let
+                                { dynamicList } =
+                                    model
+
+                                updatedDynamicList =
+                                    { dynamicList | items = [] }
+                            in
+                            { model | dynamicList = updatedDynamicList } => Cmd.none
             in
             { updatedModel | itemGenerator = itemGenerator }
                 => Cmd.batch [ cmd1 |> Cmd.map ItemGeneratorMsg, cmd2 ]
 
         SetDraggedItem id ->
-            { model | draggedItemId = Just id } => Cmd.none
+            { model | dynamicList = DL.setDraggedItem (Just id) model.dynamicList } => Cmd.none
 
         ClearDraggedItem _ ->
-            { model | draggedItemId = Nothing } => Cmd.none
+            { model | dynamicList = DL.setDraggedItem Nothing model.dynamicList } => Cmd.none
+
+        SetMousePosition mousePosition ->
+            { model | dynamicList = DL.setMousePosition mousePosition model.dynamicList } => Cmd.none
 
         CalculateColumns { width, height } ->
             model => Cmd.none
+
+
+buildList : Model -> List (DL.Item Msg) -> DynamicList Msg
+buildList { itemGenerator, columns } items =
+    DynamicList
+        (getDLConfig itemGenerator columns)
+        items
+        Nothing
+        { x = 0, y = 0 }
 
 
 
@@ -125,18 +149,13 @@ port windowResize : (Dimensions -> msg) -> Sub msg
 
 
 subscriptions : Model -> Sub Msg
-subscriptions { draggedItemId } =
-    let
-        clearDraggedItemCmd =
-            if draggedItemId == Nothing then
-                Sub.none
-            else
-                Sub.batch
-                    [ Mouse.ups ClearDraggedItem
-                    , mouseLeaves ClearDraggedItem
-                    ]
-    in
-    Sub.batch [ clearDraggedItemCmd, windowResize CalculateColumns ]
+subscriptions model =
+    Sub.batch
+        [ windowResize CalculateColumns
+        , Mouse.moves SetMousePosition
+        , Mouse.ups ClearDraggedItem
+        , mouseLeaves ClearDraggedItem
+        ]
 
 
 
@@ -150,51 +169,33 @@ view model =
         [ header [ Attr.class "title" ] [ h1 [] [ text "Elm Dynamic List" ] ]
         , main_ []
             [ IG.view model.itemGenerator |> Html.map ItemGeneratorMsg
-            , items model |> DL.view
+            , DL.view model.dynamicList
             ]
 
         --        , footer [] [ code [] [ text <| toString model ] ]
         ]
 
 
-items : Model -> DynamicList Msg
-items { itemGenerator, draggedItemId, randomItems, columns } =
-    DynamicList
-        (getDLConfig itemGenerator columns)
-        (List.map (randomItemView itemGenerator draggedItemId >> uncurry DL.Item) randomItems)
+onItemSelect : String -> Attribute Msg
+onItemSelect id =
+    Events.onWithOptions "mousedown"
+        { stopPropagation = True, preventDefault = True }
+        (JD.succeed (SetDraggedItem id))
 
 
-compareIds : Maybe Int -> Int -> Bool
-compareIds maybeId currentId =
-    case maybeId of
-        Just id ->
-            id == currentId
-
-        Nothing ->
-            False
-
-
-randomItemView : IG.Model -> Maybe Int -> RandomItem -> ( DL.Dimensions, Html Msg )
-randomItemView itemGenerator draggedItemId { dimensions, id } =
-    ( dimensions
-    , div
-        [ Attr.classList [ ( "item", True ), ( "dragged", compareIds draggedItemId id ) ]
-        , randomItemStyle itemGenerator dimensions
-        , Events.onMouseDown (SetDraggedItem id)
+itemView : IG.Model -> Dimensions -> String -> Html Msg
+itemView itemGenerator dimensions id =
+    div
+        [ itemStyle itemGenerator dimensions
+        , onItemSelect id
         ]
         []
-    )
 
 
-randomItemStyle : IG.Model -> Dimensions -> Html.Attribute Msg
-randomItemStyle itemGenerator { width, height } =
+itemStyle : IG.Model -> Dimensions -> Html.Attribute Msg
+itemStyle itemGenerator { width, height } =
     Attr.style
-        [ ( "margin"
-          , maybeIntToPx itemGenerator.yMargin IG.defaultYMargin
-                ++ " "
-                ++ maybeIntToPx itemGenerator.xMargin IG.defaultXMargin
-          )
-        , ( "width", width |> toString |> flip (++) "px" )
+        [ ( "width", width |> toString |> flip (++) "px" )
         , ( "height", height |> toString |> flip (++) "px" )
         ]
 

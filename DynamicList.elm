@@ -5,17 +5,37 @@ module DynamicList
         , DynamicList
         , Item
         , ListType(..)
-        , Translation
+        , Position
+        , empty
+        , setDraggedItem
+        , setItems
+        , setMousePosition
         , view
         )
 
 import Array exposing (Array)
 import Html exposing (Html, div)
-import Html.Attributes exposing (style)
+import Html.Attributes exposing (class, classList, style)
+
+
+-- MODEL
 
 
 type alias DynamicList msg =
-    { config : Config, items : List (Item msg) }
+    { config : Config
+    , items : List (Item msg)
+    , draggedId : Maybe String
+    , mousePosition : Position
+    }
+
+
+empty : DynamicList msg
+empty =
+    { config = defaultConfig
+    , items = []
+    , draggedId = Nothing
+    , mousePosition = { x = 0, y = 0 }
+    }
 
 
 type alias Config =
@@ -26,48 +46,85 @@ type alias Config =
     }
 
 
+defaultConfig : Config
+defaultConfig =
+    { listType = FixedWidth 240
+    , xMargin = 12
+    , yMargin = 12
+    , columns = 3
+    }
+
+
 type alias Item msg =
     { dimensions : Dimensions
+    , id : String
     , content : Html msg
     }
 
 
 type ListType
     = FixedWidth Int
-    | FixedHeight Int
 
 
 type alias Dimensions =
     { width : Int, height : Int }
 
 
-type alias Translation =
+type alias Position =
     { x : Int, y : Int }
 
 
+setItems : List (Item msg) -> DynamicList msg -> DynamicList msg
+setItems items dynamicList =
+    { dynamicList | items = items }
+
+
+setDraggedItem : Maybe String -> DynamicList msg -> DynamicList msg
+setDraggedItem draggedId dynamicList =
+    { dynamicList | draggedId = draggedId }
+
+
+setMousePosition : Position -> DynamicList msg -> DynamicList msg
+setMousePosition mousePosition dynamicList =
+    { dynamicList | mousePosition = mousePosition }
+
+
+
+-- VIEW
+
+
 view : DynamicList msg -> Html msg
-view { config, items } =
+view { config, items, draggedId } =
     let
-        translations =
-            List.map .dimensions items |> getTranslations config
+        positions =
+            List.map .dimensions items |> getPositions config
     in
     div
-        []
-        (List.map2 (itemView config) items translations)
+        [ class "dynamic-list" ]
+        (List.map2 (itemView config draggedId) items positions)
 
 
-itemView : Config -> Item msg -> Translation -> Html msg
-itemView config { content } translation =
+itemView : Config -> Maybe String -> Item msg -> Position -> Html msg
+itemView config draggedId { content, id } position =
     div
         [ style
             [ ( "position", "absolute" )
-            , ( "transform", translationStyle translation )
+            , ( "transform", translationStyle position )
+            ]
+        , classList
+            [ ( "dynamic-list-item", True )
+            , ( "dragged", isDragged id draggedId )
             ]
         ]
         [ content ]
 
 
-translationStyle : Translation -> String
+isDragged : String -> Maybe String -> Bool
+isDragged id =
+    Maybe.map ((==) id) >> Maybe.withDefault False
+
+
+translationStyle : Position -> String
 translationStyle { x, y } =
     "translate(" ++ intToPx x ++ ", " ++ intToPx y ++ ")"
 
@@ -77,20 +134,20 @@ intToPx =
     toString >> flip (++) "px"
 
 
-getTranslations : Config -> List Dimensions -> List Translation
-getTranslations config =
+getPositions : Config -> List Dimensions -> List Position
+getPositions config =
     List.foldl
-        (getTranslation config)
+        (getPosition config)
         ( Array.repeat config.columns 0, [] )
         >> Tuple.second
 
 
-getTranslation :
+getPosition :
     Config
     -> Dimensions
-    -> ( Array Int, List Translation )
-    -> ( Array Int, List Translation )
-getTranslation config { height } ( columnHeights, translations ) =
+    -> ( Array Int, List Position )
+    -> ( Array Int, List Position )
+getPosition config { height } ( columnHeights, positions ) =
     case config.listType of
         FixedWidth width ->
             let
@@ -98,19 +155,16 @@ getTranslation config { height } ( columnHeights, translations ) =
                     getMinColumn columnHeights
 
                 translateX =
-                    index * (width + config.xMargin)
+                    index * (width + config.xMargin) + config.xMargin
 
                 newHeight =
                     height + translateY + config.yMargin
             in
             ( updateColumnHeights index newHeight columnHeights
-            , Translation translateX translateY
+            , Position translateX translateY
                 |> List.singleton
-                |> List.append translations
+                |> List.append positions
             )
-
-        _ ->
-            ( Array.empty, [] )
 
 
 updateColumnHeights : Int -> Int -> Array Int -> Array Int
@@ -118,11 +172,11 @@ updateColumnHeights minIndex newHeight heights =
     Array.set minIndex newHeight heights
 
 
-updateTranslations : Int -> Int -> List Translation -> List Translation
-updateTranslations x y translations =
-    Translation x y
+updatePositions : Int -> Int -> List Position -> List Position
+updatePositions x y positions =
+    Position x y
         |> List.singleton
-        |> List.append translations
+        |> List.append positions
 
 
 getMinColumn : Array Int -> ( Int, Int, Int )
