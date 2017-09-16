@@ -7,15 +7,20 @@ module DynamicList
         , ListType(..)
         , Position
         , empty
+        , setContainerId
+        , setContainerWidth
         , setDraggedItem
         , setItems
+        , setListType
         , setMousePosition
+        , setXMargin
+        , setYMargin
         , view
         )
 
 import Array exposing (Array)
 import Html exposing (Html, div)
-import Html.Attributes exposing (class, classList, style)
+import Html.Attributes as Attr
 
 
 -- MODEL
@@ -42,16 +47,33 @@ type alias Config =
     { listType : ListType
     , xMargin : Int
     , yMargin : Int
-    , columns : Int
+    , containerWidth : Int
+    , containerId : String
     }
+
+
+defaultItemWidth : Int
+defaultItemWidth =
+    240
+
+
+defaultMargin : Int
+defaultMargin =
+    12
+
+
+defaultColumns : Int
+defaultColumns =
+    3
 
 
 defaultConfig : Config
 defaultConfig =
-    { listType = FixedWidth 240
-    , xMargin = 12
-    , yMargin = 12
-    , columns = 3
+    { listType = FixedWidth defaultItemWidth
+    , xMargin = defaultMargin
+    , yMargin = defaultMargin
+    , containerWidth = defaultColumns * (defaultItemWidth + defaultMargin) + defaultMargin
+    , containerId = "dynamic-list-1"
     }
 
 
@@ -89,6 +111,66 @@ setMousePosition mousePosition dynamicList =
     { dynamicList | mousePosition = mousePosition }
 
 
+setContainerWidth : Int -> DynamicList msg -> DynamicList msg
+setContainerWidth containerWidth dynamicList =
+    let
+        { config } =
+            dynamicList
+
+        updatedConfig =
+            { config | containerWidth = containerWidth }
+    in
+    { dynamicList | config = updatedConfig }
+
+
+setXMargin : Int -> DynamicList msg -> DynamicList msg
+setXMargin xMargin dynamicList =
+    let
+        { config } =
+            dynamicList
+
+        updatedConfig =
+            { config | xMargin = xMargin }
+    in
+    { dynamicList | config = updatedConfig }
+
+
+setYMargin : Int -> DynamicList msg -> DynamicList msg
+setYMargin yMargin dynamicList =
+    let
+        { config } =
+            dynamicList
+
+        updatedConfig =
+            { config | yMargin = yMargin }
+    in
+    { dynamicList | config = updatedConfig }
+
+
+setListType : ListType -> DynamicList msg -> DynamicList msg
+setListType listType dynamicList =
+    let
+        { config } =
+            dynamicList
+
+        updatedConfig =
+            { config | listType = listType }
+    in
+    { dynamicList | config = updatedConfig }
+
+
+setContainerId : String -> DynamicList msg -> DynamicList msg
+setContainerId containerId dynamicList =
+    let
+        { config } =
+            dynamicList
+
+        updatedConfig =
+            { config | containerId = containerId }
+    in
+    { dynamicList | config = updatedConfig }
+
+
 
 -- VIEW
 
@@ -100,18 +182,20 @@ view { config, items, draggedId } =
             List.map .dimensions items |> getPositions config
     in
     div
-        [ class "dynamic-list" ]
+        [ Attr.id config.containerId
+        , Attr.class "dynamic-list"
+        ]
         (List.map2 (itemView config draggedId) items positions)
 
 
 itemView : Config -> Maybe String -> Item msg -> Position -> Html msg
 itemView config draggedId { content, id } position =
     div
-        [ style
+        [ Attr.style
             [ ( "position", "absolute" )
             , ( "transform", translationStyle position )
             ]
-        , classList
+        , Attr.classList
             [ ( "dynamic-list-item", True )
             , ( "dragged", isDragged id draggedId )
             ]
@@ -136,10 +220,16 @@ intToPx =
 
 getPositions : Config -> List Dimensions -> List Position
 getPositions config =
-    List.foldl
-        (getPosition config)
-        ( Array.repeat config.columns 0, [] )
-        >> Tuple.second
+    case config.listType of
+        FixedWidth width ->
+            let
+                columns =
+                    (config.containerWidth - config.xMargin) // (width + config.xMargin)
+            in
+            List.foldl
+                (getPosition config)
+                ( Array.repeat columns 0, [] )
+                >> Tuple.second
 
 
 getPosition :

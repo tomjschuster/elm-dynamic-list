@@ -27,7 +27,6 @@ main =
 
 type alias Model =
     { itemGenerator : IG.Model
-    , columns : Int
     , dynamicList : DynamicList Msg
     }
 
@@ -35,23 +34,17 @@ type alias Model =
 initialModel : Model
 initialModel =
     { itemGenerator = IG.default
-    , columns = 3
-    , dynamicList = DL.empty
+    , dynamicList = DL.empty |> DL.setContainerId "dynamic-list-1"
     }
-
-
-getDLConfig : IG.Model -> Int -> DL.Config
-getDLConfig itemGenerator columns =
-    DL.Config
-        (IG.fixedWidth itemGenerator |> DL.FixedWidth)
-        (IG.xMargin itemGenerator)
-        (IG.yMargin itemGenerator)
-        columns
 
 
 init : ( Model, Cmd Msg )
 init =
-    initialModel => (IG.init |> Cmd.map ItemGeneratorMsg)
+    initialModel
+        => Cmd.batch
+            [ IG.init |> Cmd.map ItemGeneratorMsg
+            , getContainerWidth ()
+            ]
 
 
 type alias RandomItem =
@@ -69,7 +62,8 @@ type Msg
     | ItemGeneratorMsg IG.Msg
     | SetDraggedItem String
     | ClearDraggedItem Mouse.Position
-    | CalculateColumns Dimensions
+    | GetContainerWidth
+    | SetContainerWidth Int
     | SetMousePosition Mouse.Position
 
 
@@ -101,7 +95,7 @@ update msg model =
                                         dimensions
                             in
                             { model | dynamicList = buildList model items }
-                                => Cmd.none
+                                => getContainerWidth ()
 
                         IG.ClearItems ->
                             let
@@ -125,17 +119,23 @@ update msg model =
         SetMousePosition mousePosition ->
             { model | dynamicList = DL.setMousePosition mousePosition model.dynamicList } => Cmd.none
 
-        CalculateColumns { width, height } ->
-            model => Cmd.none
+        GetContainerWidth ->
+            model => getContainerWidth ()
+
+        SetContainerWidth width ->
+            { model | dynamicList = DL.setContainerWidth width model.dynamicList } => Cmd.none
 
 
 buildList : Model -> List (DL.Item Msg) -> DynamicList Msg
-buildList { itemGenerator, columns } items =
-    DynamicList
-        (getDLConfig itemGenerator columns)
-        items
-        Nothing
-        { x = 0, y = 0 }
+buildList { dynamicList, itemGenerator } items =
+    dynamicList
+        |> DL.setListType (IG.fixedWidth itemGenerator |> DL.FixedWidth)
+        |> DL.setXMargin (IG.xMargin itemGenerator)
+        |> DL.setYMargin (IG.yMargin itemGenerator)
+        |> DL.setItems items
+
+
+port getContainerWidth : () -> Cmd msg
 
 
 
@@ -145,13 +145,13 @@ buildList { itemGenerator, columns } items =
 port mouseLeaves : (Mouse.Position -> msg) -> Sub msg
 
 
-port windowResize : (Dimensions -> msg) -> Sub msg
+port windowResize : (Int -> msg) -> Sub msg
 
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ windowResize CalculateColumns
+        [ windowResize SetContainerWidth
         , Mouse.moves SetMousePosition
         , Mouse.ups ClearDraggedItem
         , mouseLeaves ClearDraggedItem
