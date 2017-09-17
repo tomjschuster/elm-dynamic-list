@@ -12,7 +12,6 @@ module DynamicList
         , releaseItem
         , repositionItems
         , setContainerId
-        , setContainerPosition
         , setContainerWidth
         , setItems
         , setListType
@@ -87,7 +86,6 @@ defaultConfig =
 type alias Container =
     { id : String
     , width : Int
-    , position : Position
     }
 
 
@@ -95,7 +93,6 @@ emptyContainer : Container
 emptyContainer =
     { id = ""
     , width = 0
-    , position = { x = 0, y = 0 }
     }
 
 
@@ -168,18 +165,6 @@ setContainerWidth width dynamicList =
 
         updatedContainer =
             { container | width = width }
-    in
-    { dynamicList | container = updatedContainer }
-
-
-setContainerPosition : Position -> DynamicList msg -> DynamicList msg
-setContainerPosition position dynamicList =
-    let
-        { container } =
-            dynamicList
-
-        updatedContainer =
-            { container | position = position }
     in
     { dynamicList | container = updatedContainer }
 
