@@ -28,6 +28,7 @@ main =
 type alias Model =
     { itemGenerator : IG.Model
     , dynamicList : DynamicList Msg
+    , mousePosition : Mouse.Position
     }
 
 
@@ -35,6 +36,7 @@ initialModel : Model
 initialModel =
     { itemGenerator = IG.default
     , dynamicList = DL.empty |> DL.setContainerId "dynamic-list-1"
+    , mousePosition = { x = 0, y = 0 }
     }
 
 
@@ -60,8 +62,8 @@ type alias RandomItem =
 type Msg
     = NoOp
     | ItemGeneratorMsg IG.Msg
-    | SetDraggedItem String
-    | ClearDraggedItem Mouse.Position
+    | DragItem String
+    | ReleaseItem Mouse.Position
     | GetContainerWidth
     | SetContainerWidth Int
     | SetMousePosition Mouse.Position
@@ -91,6 +93,7 @@ update msg model =
                                             DL.Item dim
                                                 (idx + 1 |> toString)
                                                 (itemView model.itemGenerator dim (idx + 1 |> toString))
+                                                { x = 0, y = 0 }
                                         )
                                         dimensions
                             in
@@ -110,20 +113,30 @@ update msg model =
             { updatedModel | itemGenerator = itemGenerator }
                 => Cmd.batch [ cmd1 |> Cmd.map ItemGeneratorMsg, cmd2 ]
 
-        SetDraggedItem id ->
-            { model | dynamicList = DL.setDraggedItem (Just id) model.dynamicList } => Cmd.none
+        DragItem id ->
+            { model | dynamicList = DL.dragItem id model.mousePosition model.dynamicList } => Cmd.none
 
-        ClearDraggedItem _ ->
-            { model | dynamicList = DL.setDraggedItem Nothing model.dynamicList } => Cmd.none
+        ReleaseItem _ ->
+            { model | dynamicList = DL.releaseItem model.dynamicList } => Cmd.none
 
         SetMousePosition mousePosition ->
-            { model | dynamicList = DL.setMousePosition mousePosition model.dynamicList } => Cmd.none
+            { model
+                | dynamicList = DL.setMousePosition mousePosition model.dynamicList
+                , mousePosition = mousePosition
+            }
+                => Cmd.none
 
         GetContainerWidth ->
             model => getContainerWidth ()
 
         SetContainerWidth width ->
-            { model | dynamicList = DL.setContainerWidth width model.dynamicList } => Cmd.none
+            { model
+                | dynamicList =
+                    model.dynamicList
+                        |> DL.setContainerWidth width
+                        |> DL.repositionItems
+            }
+                => Cmd.none
 
 
 buildList : Model -> List (DL.Item Msg) -> DynamicList Msg
@@ -153,8 +166,8 @@ subscriptions model =
     Sub.batch
         [ windowResize SetContainerWidth
         , Mouse.moves SetMousePosition
-        , Mouse.ups ClearDraggedItem
-        , mouseLeaves ClearDraggedItem
+        , Mouse.ups ReleaseItem
+        , mouseLeaves ReleaseItem
         ]
 
 
@@ -180,7 +193,7 @@ onItemSelect : String -> Attribute Msg
 onItemSelect id =
     Events.onWithOptions "mousedown"
         { stopPropagation = True, preventDefault = True }
-        (JD.succeed (SetDraggedItem id))
+        (JD.succeed (DragItem id))
 
 
 itemView : IG.Model -> Dimensions -> String -> Html Msg

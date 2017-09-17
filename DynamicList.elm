@@ -6,10 +6,12 @@ module DynamicList
         , Item
         , ListType(..)
         , Position
+        , dragItem
         , empty
+        , releaseItem
+        , repositionItems
         , setContainerId
         , setContainerWidth
-        , setDraggedItem
         , setItems
         , setListType
         , setMousePosition
@@ -29,16 +31,21 @@ import Html.Attributes as Attr
 type alias DynamicList msg =
     { config : Config
     , items : List (Item msg)
-    , draggedId : Maybe String
+    , draggedItem : DraggedItem
     , mousePosition : Position
     }
+
+
+type DraggedItem
+    = DraggedItem String Position
+    | None
 
 
 empty : DynamicList msg
 empty =
     { config = defaultConfig
     , items = []
-    , draggedId = Nothing
+    , draggedItem = None
     , mousePosition = { x = 0, y = 0 }
     }
 
@@ -81,6 +88,7 @@ type alias Item msg =
     { dimensions : Dimensions
     , id : String
     , content : Html msg
+    , position : Position
     }
 
 
@@ -98,12 +106,22 @@ type alias Position =
 
 setItems : List (Item msg) -> DynamicList msg -> DynamicList msg
 setItems items dynamicList =
-    { dynamicList | items = items }
+    { dynamicList | items = getPositions dynamicList.config items }
 
 
-setDraggedItem : Maybe String -> DynamicList msg -> DynamicList msg
-setDraggedItem draggedId dynamicList =
-    { dynamicList | draggedId = draggedId }
+repositionItems : DynamicList msg -> DynamicList msg
+repositionItems dynamicList =
+    { dynamicList | items = getPositions dynamicList.config dynamicList.items }
+
+
+dragItem : String -> Position -> DynamicList msg -> DynamicList msg
+dragItem draggedId position dynamicList =
+    { dynamicList | draggedItem = DraggedItem draggedId position }
+
+
+releaseItem : DynamicList msg -> DynamicList msg
+releaseItem dynamicList =
+    { dynamicList | draggedItem = None }
 
 
 setMousePosition : Position -> DynamicList msg -> DynamicList msg
@@ -171,30 +189,32 @@ setContainerId containerId dynamicList =
     { dynamicList | config = updatedConfig }
 
 
+moveItem : Position -> Item msg -> Item msg
+moveItem position item =
+    { item | position = position }
+
+
 
 -- VIEW
 
 
 view : DynamicList msg -> Html msg
-view { config, items, draggedId, mousePosition } =
+view { config, items, draggedItem, mousePosition } =
     let
-        positions =
-            List.map .dimensions items |> getPositions config
-
         fixedItems =
-            List.map2 (itemView config draggedId) items positions
+            List.map (itemView config draggedItem) items
 
         allItems =
-            case draggedId of
-                Just id ->
+            case draggedItem of
+                DraggedItem id clickPosition ->
                     items
                         |> List.filter (.id >> (==) id)
                         |> List.head
                         |> Maybe.map
-                            (draggedItemView config mousePosition >> flip (::) fixedItems)
+                            (draggedItemView config clickPosition mousePosition >> flip (::) fixedItems)
                         |> Maybe.withDefault fixedItems
 
-                Nothing ->
+                None ->
                     fixedItems
     in
     div
@@ -204,8 +224,8 @@ view { config, items, draggedId, mousePosition } =
         allItems
 
 
-draggedItemView : Config -> Position -> Item msg -> Html msg
-draggedItemView { listType } { x, y } { dimensions, content } =
+draggedItemView : Config -> Position -> Position -> Item msg -> Html msg
+draggedItemView { listType } clickPosition { x, y } { dimensions, content } =
     let
         (FixedWidth width) =
             listType
@@ -223,8 +243,8 @@ draggedItemView { listType } { x, y } { dimensions, content } =
         [ content ]
 
 
-itemView : Config -> Maybe String -> Item msg -> Position -> Html msg
-itemView config draggedId { content, id } position =
+itemView : Config -> DraggedItem -> Item msg -> Html msg
+itemView config draggedItem { content, id, position } =
     div
         [ Attr.style
             [ ( "position", "absolute" )
@@ -232,15 +252,20 @@ itemView config draggedId { content, id } position =
             ]
         , Attr.classList
             [ ( "dynamic-list-item", True )
-            , ( "dragged", isDragged id draggedId )
+            , ( "dragged", isDragged id draggedItem )
             ]
         ]
         [ content ]
 
 
-isDragged : String -> Maybe String -> Bool
-isDragged id =
-    Maybe.map ((==) id) >> Maybe.withDefault False
+isDragged : String -> DraggedItem -> Bool
+isDragged id draggedItem =
+    case draggedItem of
+        DraggedItem draggedId clickPosition ->
+            id == draggedId
+
+        None ->
+            False
 
 
 translationStyle : Position -> String
@@ -253,7 +278,7 @@ intToPx =
     toString >> flip (++) "px"
 
 
-getPositions : Config -> List Dimensions -> List Position
+getPositions : Config -> List (Item msg) -> List (Item msg)
 getPositions config =
     case config.listType of
         FixedWidth width ->
@@ -273,10 +298,10 @@ getPositions config =
 getPosition :
     Config
     -> Int
-    -> Dimensions
-    -> ( Array Int, List Position )
-    -> ( Array Int, List Position )
-getPosition config leftShift { height } ( columnHeights, positions ) =
+    -> Item msg
+    -> ( Array Int, List (Item msg) )
+    -> ( Array Int, List (Item msg) )
+getPosition config leftShift item ( columnHeights, items ) =
     case config.listType of
         FixedWidth width ->
             let
@@ -287,12 +312,13 @@ getPosition config leftShift { height } ( columnHeights, positions ) =
                     index * (width + config.xMargin) + config.xMargin + leftShift
 
                 newHeight =
-                    height + translateY + config.yMargin
+                    item.dimensions.height + translateY + config.yMargin
             in
             ( updateColumnHeights index newHeight columnHeights
-            , Position translateX translateY
+            , item
+                |> moveItem (Position translateX translateY)
                 |> List.singleton
-                |> List.append positions
+                |> List.append items
             )
 
 
