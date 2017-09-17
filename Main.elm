@@ -142,7 +142,6 @@ update msg model =
 buildList : Model -> List (DL.Item Msg) -> DynamicList Msg
 buildList { dynamicList, itemGenerator } items =
     dynamicList
-        |> DL.setListType (IG.fixedWidth itemGenerator |> DL.FixedWidth)
         |> DL.setXMargin (IG.xMargin itemGenerator)
         |> DL.setYMargin (IG.yMargin itemGenerator)
         |> DL.setItems items

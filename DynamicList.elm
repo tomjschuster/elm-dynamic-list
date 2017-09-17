@@ -4,13 +4,15 @@ module DynamicList
         , Dimensions
         , DynamicList
         , Item
-        , ListType(..)
+        , ListType
         , Position
         , dragItem
         , empty
+        , emptyContainer
         , releaseItem
         , repositionItems
         , setContainerId
+        , setContainerPosition
         , setContainerWidth
         , setItems
         , setListType
@@ -30,6 +32,7 @@ import Html.Attributes as Attr
 
 type alias DynamicList msg =
     { config : Config
+    , container : Container
     , items : List (Item msg)
     , draggedItem : DraggedItem
     , mousePosition : Position
@@ -44,6 +47,7 @@ type DraggedItem
 empty : DynamicList msg
 empty =
     { config = defaultConfig
+    , container = emptyContainer
     , items = []
     , draggedItem = None
     , mousePosition = { x = 0, y = 0 }
@@ -54,8 +58,6 @@ type alias Config =
     { listType : ListType
     , xMargin : Int
     , yMargin : Int
-    , containerWidth : Int
-    , containerId : String
     }
 
 
@@ -79,8 +81,21 @@ defaultConfig =
     { listType = FixedWidth defaultItemWidth
     , xMargin = defaultMargin
     , yMargin = defaultMargin
-    , containerWidth = defaultColumns * (defaultItemWidth + defaultMargin) + defaultMargin
-    , containerId = "dynamic-list-1"
+    }
+
+
+type alias Container =
+    { id : String
+    , width : Int
+    , position : Position
+    }
+
+
+emptyContainer : Container
+emptyContainer =
+    { id = ""
+    , width = 0
+    , position = { x = 0, y = 0 }
     }
 
 
@@ -106,12 +121,16 @@ type alias Position =
 
 setItems : List (Item msg) -> DynamicList msg -> DynamicList msg
 setItems items dynamicList =
-    { dynamicList | items = getPositions dynamicList.config items }
+    { dynamicList
+        | items = getPositions dynamicList.config dynamicList.container items
+    }
 
 
 repositionItems : DynamicList msg -> DynamicList msg
 repositionItems dynamicList =
-    { dynamicList | items = getPositions dynamicList.config dynamicList.items }
+    { dynamicList
+        | items = getPositions dynamicList.config dynamicList.container dynamicList.items
+    }
 
 
 dragItem : String -> Position -> DynamicList msg -> DynamicList msg
@@ -129,16 +148,40 @@ setMousePosition mousePosition dynamicList =
     { dynamicList | mousePosition = mousePosition }
 
 
-setContainerWidth : Int -> DynamicList msg -> DynamicList msg
-setContainerWidth containerWidth dynamicList =
+setContainerId : String -> DynamicList msg -> DynamicList msg
+setContainerId id dynamicList =
     let
-        { config } =
+        { container } =
             dynamicList
 
-        updatedConfig =
-            { config | containerWidth = containerWidth }
+        updatedContainer =
+            { container | id = id }
     in
-    { dynamicList | config = updatedConfig }
+    { dynamicList | container = updatedContainer }
+
+
+setContainerWidth : Int -> DynamicList msg -> DynamicList msg
+setContainerWidth width dynamicList =
+    let
+        { container } =
+            dynamicList
+
+        updatedContainer =
+            { container | width = width }
+    in
+    { dynamicList | container = updatedContainer }
+
+
+setContainerPosition : Position -> DynamicList msg -> DynamicList msg
+setContainerPosition position dynamicList =
+    let
+        { container } =
+            dynamicList
+
+        updatedContainer =
+            { container | position = position }
+    in
+    { dynamicList | container = updatedContainer }
 
 
 setXMargin : Int -> DynamicList msg -> DynamicList msg
@@ -177,18 +220,6 @@ setListType listType dynamicList =
     { dynamicList | config = updatedConfig }
 
 
-setContainerId : String -> DynamicList msg -> DynamicList msg
-setContainerId containerId dynamicList =
-    let
-        { config } =
-            dynamicList
-
-        updatedConfig =
-            { config | containerId = containerId }
-    in
-    { dynamicList | config = updatedConfig }
-
-
 moveItem : Position -> Item msg -> Item msg
 moveItem position item =
     { item | position = position }
@@ -199,7 +230,7 @@ moveItem position item =
 
 
 view : DynamicList msg -> Html msg
-view { config, items, draggedItem, mousePosition } =
+view { config, container, items, draggedItem, mousePosition } =
     let
         fixedItems =
             List.map (itemView config draggedItem) items
@@ -218,17 +249,21 @@ view { config, items, draggedItem, mousePosition } =
                     fixedItems
     in
     div
-        [ Attr.id config.containerId
+        [ Attr.id container.id
         , Attr.class "dynamic-list"
+        , Attr.style [ ( "position", "relative" ) ]
         ]
         allItems
 
 
 draggedItemView : Config -> Position -> Position -> Item msg -> Html msg
-draggedItemView { listType } clickPosition { x, y } { dimensions, content } =
+draggedItemView { listType } clickPosition mousePosition { position, dimensions, content } =
     let
         (FixedWidth width) =
             listType
+
+        offset =
+            { x = clickPosition.x - position.x, y = clickPosition.y - position.y }
     in
     div
         [ Attr.style
@@ -236,8 +271,8 @@ draggedItemView { listType } clickPosition { x, y } { dimensions, content } =
             , ( "height", dimensions.height |> toString |> flip (++) "px" )
             , ( "width", width |> toString |> flip (++) "px" )
             , ( "position", "absolute" )
-            , ( "left", x |> toString |> flip (++) "px" )
-            , ( "top", y |> toString |> flip (++) "px" )
+            , ( "left", mousePosition.x - offset.x |> toString |> flip (++) "px" )
+            , ( "top", mousePosition.y - offset.y |> toString |> flip (++) "px" )
             ]
         ]
         [ content ]
@@ -278,16 +313,16 @@ intToPx =
     toString >> flip (++) "px"
 
 
-getPositions : Config -> List (Item msg) -> List (Item msg)
-getPositions config =
+getPositions : Config -> Container -> List (Item msg) -> List (Item msg)
+getPositions config container =
     case config.listType of
         FixedWidth width ->
             let
                 columns =
-                    (config.containerWidth - config.xMargin) // (width + config.xMargin)
+                    (container.width - config.xMargin) // (width + config.xMargin)
 
                 leftShift =
-                    rem (config.containerWidth - config.xMargin) (width + config.xMargin) // 2
+                    rem (container.width - config.xMargin) (width + config.xMargin) // 2
             in
             List.foldl
                 (getPosition config leftShift)
