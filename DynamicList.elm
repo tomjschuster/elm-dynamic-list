@@ -11,6 +11,7 @@ module DynamicList
         , emptyContainer
         , releaseItem
         , repositionItems
+        , resortList
         , setContainerId
         , setContainerWidth
         , setItems
@@ -208,6 +209,49 @@ setListType listType dynamicList =
 moveItem : Position -> Item msg -> Item msg
 moveItem position item =
     { item | position = position }
+
+
+resortList : String -> DynamicList msg -> DynamicList msg
+resortList overId dynamicList =
+    case dynamicList.draggedItem of
+        None ->
+            dynamicList
+
+        DraggedItem draggedId _ ->
+            if draggedId == overId then
+                dynamicList
+            else
+                let
+                    maybeDraggedItem =
+                        List.filter (.id >> (==) draggedId) dynamicList.items |> List.head
+                in
+                dynamicList.items
+                    |> List.foldr (compareDraggedItem overId draggedId) ( maybeDraggedItem, [] )
+                    |> Tuple.second
+                    |> flip setItems dynamicList
+
+
+compareDraggedItem : String -> String -> Item msg -> ( Maybe (Item msg), List (Item msg) ) -> ( Maybe (Item msg), List (Item msg) )
+compareDraggedItem overId draggedId item ( maybeDraggedItem, acc ) =
+    maybeDraggedItem
+        |> Maybe.map
+            (\draggedItem ->
+                case ( draggedId == item.id, overId == item.id ) of
+                    ( True, False ) ->
+                        ( Just draggedItem, acc )
+
+                    ( False, True ) ->
+                        ( Nothing, draggedItem :: item :: acc )
+
+                    ( _, _ ) ->
+                        ( Just draggedItem, item :: acc )
+            )
+        |> Maybe.withDefault
+            (if draggedId == item.id then
+                ( Nothing, acc )
+             else
+                ( Nothing, item :: acc )
+            )
 
 
 

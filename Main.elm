@@ -67,6 +67,7 @@ type Msg
     | GetContainerWidth
     | SetContainerWidth Int
     | SetMousePosition Mouse.Position
+    | ResortList String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -138,6 +139,15 @@ update msg model =
             }
                 => Cmd.none
 
+        ResortList id ->
+            { model
+                | dynamicList =
+                    model.dynamicList
+                        |> DL.resortList id
+                        |> DL.repositionItems
+            }
+                => Cmd.none
+
 
 buildList : Model -> List (DL.Item Msg) -> DynamicList Msg
 buildList { dynamicList, itemGenerator } items =
@@ -200,8 +210,9 @@ itemView itemGenerator dimensions id =
     div
         [ itemStyle itemGenerator dimensions
         , onItemSelect id
+        , Events.onMouseOver (ResortList id)
         ]
-        []
+        [ id |> toString |> text ]
 
 
 itemStyle : IG.Model -> Dimensions -> Html.Attribute Msg
